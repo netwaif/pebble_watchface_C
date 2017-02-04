@@ -1,0 +1,27 @@
+{
+    "author": "netwaif@gmail.com",
+    "dependencies": {},
+    "keywords": [],
+    "name": "pebble_watchface_c",
+    "pebble": {
+        "capabilities": [
+            "configurable"
+        ],
+        "displayName": "pebble_watchface_C",
+        "enableMultiJS": true,
+        "messageKeys": [],
+        "projectType": "native",
+        "resources": {
+            "media": []
+        },
+        "sdkVersion": "3",
+        "targetPlatforms": [
+            "chalk"
+        ],
+        "uuid": "16cab976-99f0-4bd0-b30e-ed097a4b20c8",
+        "watchapp": {
+            "watchface": true
+        }
+    },
+    "version": "1.0.0"
+}

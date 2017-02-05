@@ -1,6 +1,11 @@
 {
     "author": "netwaif@gmail.com",
-    "dependencies": {},
+    "dependencies": {
+        "pebble-battery-bar": "^1.0.9",
+        "pebble-bluetooth-icon": "^1.0.7",
+        "pebble-events": "^1.2.0",
+        "pebble-helpers": "^1.0.0"
+    },
     "keywords": [],
     "name": "pebble_watchface_c",
     "pebble": {

@@ -1,6 +1,6 @@
 #include <pebble.h>
-#include <pebble-events/pebble-events.h>
 #include "layer_bluetooth.h"
+#include <pebble-fctx/fctx.h>
 #include "config.h"
 
 typedef struct BluetoothIconSettings {
@@ -16,7 +16,7 @@ typedef struct BluetoothIconSettings {
 } BluetoothIconSettings;
 
 static Layer *s_bluetooth_layer, *s_bluetooth_icon_layer, *s_bluetooth_circle_layer;
-static EventHandle s_handle;
+//static EventHandle s_handle;
 
 static GPath *s_bluetooth_path_ptr = NULL;
 static GPathInfo BT_PATH_INFO = {
@@ -26,13 +26,18 @@ static GPathInfo BT_PATH_INFO = {
 
 // Draw the circle
 static void bluetooth_circle_layer_update_callback(Layer *layer, GContext* ctx) {
+	graphics_context_set_antialiased(ctx,true);
   BluetoothIconSettings *data = layer_get_data(s_bluetooth_layer);
+	//graphics_context_set_fill_color(ctx, DEF_LAYER_BACKGROUND);
+	//graphics_fill_circle(ctx, GPoint(5, 5), 5);
+	
   graphics_context_set_fill_color(ctx, (data->is_connected ? data->color_connected_circle : data->color_disconnected_circle));
   graphics_fill_circle(ctx, GPoint(5, 5), 5);
 }
 
 // Draw the icon
 static void bluetooth_icon_layer_update_callback(Layer *layer, GContext* ctx) {
+	graphics_context_set_antialiased(ctx,true);
   BluetoothIconSettings *data = layer_get_data(s_bluetooth_layer);
   graphics_context_set_stroke_color(ctx, (data->is_connected ? data->color_connected_icon : data->color_disconnected_icon));
   gpath_draw_outline(ctx, s_bluetooth_path_ptr);
@@ -40,16 +45,16 @@ static void bluetooth_icon_layer_update_callback(Layer *layer, GContext* ctx) {
 
 // Vibrate if required and update the icon
 static void bluetooth_connection_callback(bool connected) {
-  LOG("bluetooth_connection STATUS: %D", connected);
+  LOG("bluetooth_connection STATUS: %d", connected);
 	BluetoothIconSettings *data = layer_get_data(s_bluetooth_layer);
 
-  /* if(data->vibe_disconnect && (data->is_connected && !connected)) {
+   if(data->vibe_disconnect && (data->is_connected && !connected)) {
     // Just disconnected
     vibes_double_pulse();
   } else if (data->vibe_connect && (!data->is_connected && connected)) {
     // Just connected
     vibes_short_pulse();
-  } */
+  }
 
   data->is_connected = connected;
   layer_mark_dirty(s_bluetooth_circle_layer);
@@ -57,8 +62,9 @@ static void bluetooth_connection_callback(bool connected) {
 }
 
 // Force the icon to refresh
-static void bluetooth_refresh() {
+void bluetooth_refresh() {
   BluetoothIconSettings *data = layer_get_data(s_bluetooth_layer);
+	data->is_connected = connection_service_peek_pebble_app_connection();
   bluetooth_connection_callback(data->is_connected);
 }
 
@@ -67,7 +73,7 @@ static void bluetooth_set_defaults(BluetoothIconSettings *data) {
   data->is_connected = false;
   data->circle_layer_rect = GRect(0, 0, 13, 13);
   data->icon_layer_rect = GRect(2, 1, 7, 9);
-  data->vibe_disconnect = false;
+  data->vibe_disconnect = true;
   data->vibe_connect = false;
   data->color_connected_icon = GColorGreen;
   data->color_connected_circle = GColorBlue;
@@ -77,7 +83,7 @@ static void bluetooth_set_defaults(BluetoothIconSettings *data) {
 
 // Create a new bluetooth layer and start monitoring.
 Layer* layer_bluetooth_create(GRect root_bounds) {
-  s_bluetooth_layer = layer_create_with_data(GRect(root_bounds.origin.x, root_bounds.origin.y, 13, 13), sizeof(BluetoothIconSettings));
+  s_bluetooth_layer = layer_create_with_data(GRect(root_bounds.origin.x, root_bounds.origin.y+root_bounds.size.h-13, 13, 13), sizeof(BluetoothIconSettings));
 
   BluetoothIconSettings *data = layer_get_data(s_bluetooth_layer);
   bluetooth_set_defaults(data);
@@ -93,7 +99,7 @@ Layer* layer_bluetooth_create(GRect root_bounds) {
   layer_add_child(s_bluetooth_layer, s_bluetooth_icon_layer);
 
   bluetooth_connection_callback(connection_service_peek_pebble_app_connection());
-  s_handle = events_connection_service_subscribe((ConnectionHandlers) {
+  connection_service_subscribe((ConnectionHandlers) {
     .pebble_app_connection_handler = bluetooth_connection_callback
   });
 
@@ -102,7 +108,7 @@ Layer* layer_bluetooth_create(GRect root_bounds) {
 
 // Destroy the layer and its contents.
 void bluetooth_layer_destroy(Layer *bluetooth_layer) {
-  events_connection_service_unsubscribe(s_handle);
+  connection_service_unsubscribe();
   gpath_destroy(s_bluetooth_path_ptr);
   s_bluetooth_path_ptr = NULL;
 

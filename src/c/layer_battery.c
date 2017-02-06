@@ -1,5 +1,4 @@
 #include <pebble.h>
-#include <pebble-events/pebble-events.h>
 #include "layer_battery.h"
 #include "config.h"
 
@@ -20,7 +19,6 @@ typedef struct BatteryBarSettings {
 
 static Layer *s_battery_container_layer, *s_battery_icon_layer, *s_battery_bolt_layer;
 static TextLayer *s_battery_percent_layer;
-static EventHandle s_handle;
 
 static GPath *s_battery_bolt_path_ptr = NULL;
 
@@ -32,7 +30,7 @@ static GPathInfo s_battery_bolt_path_info = {
 // Check current battery level, change colors and set percentage level.
 static void battery_bar_battery_update(BatteryChargeState charge_state) {
   BatteryBarSettings *data = layer_get_data(s_battery_container_layer);
-
+	
   data->charge_percent = charge_state.charge_percent;
   data->is_charging = charge_state.is_charging;
   if(data->charge_percent == 0) {
@@ -54,14 +52,28 @@ static void battery_bar_battery_update(BatteryChargeState charge_state) {
 
   layer_set_hidden(text_layer_get_layer(s_battery_percent_layer), data->hide_percent);
   layer_set_hidden(s_battery_icon_layer, data->hide_icon);
-
+	
+	layer_mark_dirty(s_battery_container_layer);
   layer_mark_dirty(s_battery_icon_layer);
+}
+
+static void battery_container_layer_update_callback(Layer *container_layer, GContext* ctx){
+	graphics_context_set_antialiased(ctx,true);
+	GRect bounds = layer_get_bounds(container_layer);
+	
+	graphics_context_set_fill_color(ctx, DEF_LAYER_BACKGROUND);
+	graphics_fill_rect(ctx, bounds, 0, GCornerNone);
+	#if DEBUG
+		graphics_context_set_stroke_color(ctx, GColorRed);
+		graphics_draw_rect(ctx, bounds);
+	#endif
 }
 
 // Draw the battery icon and charging indicator.
 static void battery_bar_layer_update_callback(Layer *icon_layer, GContext* ctx) {
+	graphics_context_set_antialiased(ctx,true);
   BatteryBarSettings *data = layer_get_data(s_battery_container_layer);
-
+	
   graphics_context_set_stroke_color(ctx, data->color_state);
   graphics_draw_rect(ctx, GRect(0, 0, 16, 9));
   graphics_draw_rect(ctx, GRect(15, 2, 2, 5));
@@ -71,7 +83,7 @@ static void battery_bar_layer_update_callback(Layer *icon_layer, GContext* ctx) 
 
   if(data->is_charging) {
     graphics_context_set_stroke_color(ctx, data->color_charging);
-    gpath_draw_outline(ctx, s_battery_bolt_path_ptr);
+    gpath_draw_outline_antialiased(ctx, s_battery_bolt_path_ptr);
   } else {
     uint8_t width = ((data->charge_percent / 100.0) * 11.0);
     if(width < 12) {
@@ -82,15 +94,15 @@ static void battery_bar_layer_update_callback(Layer *icon_layer, GContext* ctx) 
 }
 
 // Force the battery bar to update and redraw.
-static void battery_bar_refresh() {
+void battery_bar_refresh() {
   battery_bar_battery_update(battery_state_service_peek());
 }
 
 // Create a set of default settings.
 static void battery_bar_set_defaults(BatteryBarSettings *data) {
-  data->percent_font = fonts_get_system_font(FONT_KEY_GOTHIC_09);
-  data->percent_layer_rect = GRect(0, -1, 21, 10);
-  data->icon_layer_rect = GRect(22, 0, 17, 9);
+  data->percent_font = fonts_get_system_font(FONT_KEY_GOTHIC_14);
+  data->percent_layer_rect = GRect(0, -1, 30, 15);
+  data->icon_layer_rect = GRect(31, 4, 17, 9);
   data->hide_percent = false;
   data->hide_icon = false;
   #ifdef PBL_COLOR
@@ -108,8 +120,8 @@ static void battery_bar_set_defaults(BatteryBarSettings *data) {
 
 // Create a new battery bar layer and start monitoring.
 Layer* layer_battery_create(GRect root_bounds) {
-  s_battery_container_layer = layer_create_with_data(GRect(root_bounds.origin.x, root_bounds.origin.y, 39, 10), sizeof(BatteryBarSettings));
-
+  s_battery_container_layer = layer_create_with_data(GRect(root_bounds.origin.x+root_bounds.size.w-48, root_bounds.origin.y+root_bounds.size.h-15, 48, 15), sizeof(BatteryBarSettings));
+	layer_set_update_proc(s_battery_container_layer, battery_container_layer_update_callback);
   BatteryBarSettings *data = layer_get_data(s_battery_container_layer);
   battery_bar_set_defaults(data);
 
@@ -127,14 +139,14 @@ Layer* layer_battery_create(GRect root_bounds) {
   layer_add_child(s_battery_container_layer, s_battery_icon_layer);
 
   battery_bar_refresh();
-  s_handle = events_battery_state_service_subscribe(&battery_bar_battery_update);
+  battery_state_service_subscribe(battery_bar_battery_update);
 
   return s_battery_container_layer;
 }
 
 // Destroy the layer and its contents.
 void battery_bar_layer_destroy(Layer *battery_bar_layer) {
-  events_battery_state_service_unsubscribe(s_handle);
+  battery_state_service_unsubscribe();
 
   gpath_destroy(s_battery_bolt_path_ptr);
   s_battery_bolt_path_ptr = NULL;

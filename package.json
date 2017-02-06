@@ -2,6 +2,7 @@
     "author": "netwaif@gmail.com",
     "dependencies": {
         "pebble-events": "^1.2.0",
+        "pebble-fctx": "^1.6.1",
         "pebble-helpers": "^1.0.0",
         "pebble-packet": "^1.3.2"
     },

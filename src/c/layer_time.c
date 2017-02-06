@@ -26,6 +26,7 @@ Layer * layer_time_create(GRect root_bounds){
 
 void layer_time_updater(Layer *layer, GContext *ctx){
 
+	graphics_context_set_antialiased(ctx,true);
 	GRect layer_bounds = layer_get_bounds(layer);
 	
 	#if DEBUG	//draw the layer outline bound
@@ -40,7 +41,7 @@ void layer_time_updater(Layer *layer, GContext *ctx){
 	struct tm * curr_time = &data->curr_time;
 	
 	//clearing the text area of PREVIOUS BOUND size
-	graphics_context_set_fill_color(ctx, DEF_LAYER_TIME_BACKGROUND);
+	graphics_context_set_fill_color(ctx, DEF_LAYER_BACKGROUND);
 	graphics_fill_rect(ctx, prev_bounds, 0, GCornersAll);
 	
 	//prepare the text to be displayed

@@ -19,8 +19,30 @@
         "resources": {
             "media": [
                 {
-                    "file": "data/Roboto-Bold.ffont",
-                    "name": "TIME_FONT",
+                    "file": "data/FONT_OPENSANS_BOLD",
+                    "name": "FONT_OPENSANS_BOLD",
+                    "targetPlatforms": null,
+                    "type": "raw"
+                },
+                {
+                    "file": "data/FONT_ROBOTO_BOLD_NUM",
+                    "name": "FONT_ROBOTO_BOLD_NUM",
+                    "targetPlatforms": [
+                        "chalk"
+                    ],
+                    "type": "raw"
+                },
+                {
+                    "file": "data/FONT_ARIAL",
+                    "name": "FONT_ARIAL",
+                    "targetPlatforms": [
+                        "chalk"
+                    ],
+                    "type": "raw"
+                },
+                {
+                    "file": "data/FONT_OPENSANS_LIGHT",
+                    "name": "FONT_OPENSANS_LIGHT",
                     "targetPlatforms": null,
                     "type": "raw"
                 }

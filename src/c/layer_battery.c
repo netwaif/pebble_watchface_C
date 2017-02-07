@@ -1,4 +1,7 @@
 #include <pebble.h>
+#include <pebble-fctx/fctx.h>
+#include <pebble-fctx/fpath.h>
+#include <pebble-fctx/ffont.h>
 #include "layer_battery.h"
 #include "config.h"
 
@@ -29,9 +32,10 @@ static GPathInfo s_battery_bolt_path_info = {
 
 // Check current battery level, change colors and set percentage level.
 static void battery_bar_battery_update(BatteryChargeState charge_state) {
-  BatteryBarSettings *data = layer_get_data(s_battery_container_layer);
+  LOG("battery updater: charge = %d\%, state = %d",charge_state.charge_percent,charge_state.is_charging);
 	
-  data->charge_percent = charge_state.charge_percent;
+	BatteryBarSettings *data = layer_get_data(s_battery_container_layer);
+	data->charge_percent = charge_state.charge_percent;
   data->is_charging = charge_state.is_charging;
   if(data->charge_percent == 0) {
     data->charge_percent = 1;
@@ -100,9 +104,9 @@ void battery_bar_refresh() {
 
 // Create a set of default settings.
 static void battery_bar_set_defaults(BatteryBarSettings *data) {
-  data->percent_font = fonts_get_system_font(FONT_KEY_GOTHIC_14);
+  data->percent_font = fonts_get_system_font(DEF_LAYER_BATTERY_FONT);
   data->percent_layer_rect = GRect(0, -1, 30, DEF_LAYER_INDICATORS_HEIGHT);
-  data->icon_layer_rect = GRect(31, 4, DEF_LAYER_INDICATORS_HEIGHT, 9);
+  data->icon_layer_rect = GRect(31, 4, 17, DEF_LAYER_INDICATORS_HEIGHT);
   data->hide_percent = false;
   data->hide_icon = false;
   #ifdef PBL_COLOR

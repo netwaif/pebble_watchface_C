@@ -1,6 +1,8 @@
 #include <pebble.h>
+#include <pebble-fctx/fctx.h>
+#include <pebble-fctx/fpath.h>
+#include <pebble-fctx/ffont.h>
 #include "layer_date.h"
-#include "pebble-fctx/ffont.h"
 #include "config.h"
 
 static FFont *s_date_font;
@@ -18,21 +20,19 @@ void layer_date_updater(Layer *layer, GContext *ctx){
 	//GRect prev_bounds = data->prev_bounds;
 	struct tm * curr_time = &data->curr_time;
 	//prepare the text to be displayed
-	char s_buffer[7];
-	strftime(s_buffer, sizeof(s_buffer), clock_is_24h_style() ? "%H:%M" : "%I:%M", curr_time);
-	#if DEBUG //display seconds in both fields for debug purpose
-		strftime(s_buffer, sizeof(s_buffer), clock_is_24h_style() ? "%S:%S" : "%S:%S", curr_time);
-	#endif
+	char s_buffer[]="31 Oct, WED";
+	strftime(s_buffer, sizeof(s_buffer), "%d %b, %a", curr_time);
+	LOG(s_buffer);
 	
 	//init FCTX context
 	FContext fctx;
 	fctx_enable_aa(true);
   fctx_init_context(&fctx, ctx);
-	//calculate the text width based on it's height
-	fctx_set_text_em_height(&fctx, s_date_font, DEF_LAYER_DATE_HEIGHT);
+	//calculate the text width based on layer's height
+	GRect layer_bounds = layer_get_bounds(layer);
+	fctx_set_text_em_height(&fctx, s_date_font, layer_bounds.size.h);
 	fixed_t text_width = fctx_string_width(&fctx, s_buffer, s_date_font);
 	//get the text bounds based on text size and align it within layer_bounds
-	GRect layer_bounds = layer_get_bounds(layer);
 	GRect text_bounds = GRect(layer_bounds.size.w/2-FIXED_TO_INT(text_width/2),0,FIXED_TO_INT(text_width),layer_bounds.size.h);
 	//clearing the text area based on text_bounds
 	graphics_context_set_fill_color(ctx, DEF_LAYER_BACKGROUND);
@@ -67,7 +67,7 @@ Layer * layer_date_create(GRect layer_bounds){
 	time_t start = time(NULL);
 	data->curr_time = *localtime(&start);
 	//load the font for time display
-	s_date_font = ffont_create_from_resource(RESOURCE_ID_DATE_FONT);
+	s_date_font = ffont_create_from_resource(DEF_LAYER_DATE_FONT);
 	//assign update handler for the layer
 	layer_set_update_proc(layer, layer_date_updater);
 	LOG("time layer CREATED");

@@ -3,6 +3,7 @@
 #include <pebble-events/pebble-events.h>
 #include <pebble-packet/pebble-packet.h>
 #include "layer_time.h"
+#include "layer_date.h"
 #include "layer_battery.h"
 #include "layer_bluetooth.h"
 #include "config.h"
@@ -13,8 +14,8 @@ static Window *s_main_window;
 
 void tick_handler(struct tm *tick_time, TimeUnits units_changed){
 	LOG("TICK!");
-	layer_time_update_time(tick_time, s_layers_pointers[DEF_LAYERS_ORDER_TIME]);
 	layer_date_update_date(tick_time, s_layers_pointers[DEF_LAYERS_ORDER_DATE]);
+	layer_time_update_time(tick_time, s_layers_pointers[DEF_LAYERS_ORDER_TIME]);
 	#if !DEBUG //check for bluetooth status every tick when in production
 		bluetooth_refresh();
 		battery_bar_refresh();
@@ -26,16 +27,19 @@ void main_window_load(Window *window){
 		
 	Layer *root_layer = window_get_root_layer(window);
   GRect root_bounds = layer_get_bounds(root_layer);
+	//creating a time layer DEF_LAYER_TIME_HEIGHT
 	GRect layer_time_bounds = GRect(root_bounds.origin.x
 																	,root_bounds.origin.y+root_bounds.size.h/2-DEF_LAYER_TIME_HEIGHT
 																	,root_bounds.size.w
 																	,DEF_LAYER_TIME_HEIGHT);
-	s_layers_pointers[DEF_LAYERS_ORDER_TIME] = layer_time_create(layer_time_bounds); 	//creating a time layer DEF_LAYER_TIME_HEIGHT
+	s_layers_pointers[DEF_LAYERS_ORDER_TIME] = layer_time_create(layer_time_bounds); 	
+	//creating a DATE layer DEF_LAYER_DATE_HEIGHT
 	GRect layer_date_bounds = GRect(root_bounds.origin.x
-																	,layer_time_bounds.origin.y-DEF_LAYER_DATE_HEIGHT
+																	,layer_time_bounds.origin.y-DEF_LAYER_DATE_HEIGHT+5
 																	,root_bounds.size.w
 																	,DEF_LAYER_DATE_HEIGHT);
-	//s_layers_pointers[DEF_LAYERS_ORDER_DATE] = layer_date_create(layer_date_bounds); 	//creating a DATE layer DEF_LAYER_DATE_HEIGHT
+	s_layers_pointers[DEF_LAYERS_ORDER_DATE] = layer_date_create(layer_date_bounds); 	
+	// creating indicators layer (same bounds are used for battery and bluetooth indicators)
 	GRect layer_indicators_bounds = GRect(root_bounds.size.w/3
 																	,layer_date_bounds.origin.y-DEF_LAYER_INDICATORS_HEIGHT
 																	,root_bounds.size.w/3
@@ -57,7 +61,7 @@ void main_window_unload(Window *window){
 	bluetooth_layer_destroy(s_layers_pointers[DEF_LAYERS_ORDER_BT]);
 	battery_bar_layer_destroy(s_layers_pointers[DEF_LAYERS_ORDER_BAT]);
 	layer_time_destroy(s_layers_pointers[DEF_LAYERS_ORDER_TIME]);
-
+	layer_date_destroy(s_layers_pointers[DEF_LAYERS_ORDER_DATE]);
 }
 
 void main_window_appear(Window *window){

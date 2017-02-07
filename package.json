@@ -17,7 +17,14 @@
         "messageKeys": [],
         "projectType": "native",
         "resources": {
-            "media": []
+            "media": [
+                {
+                    "file": "data/Roboto-Bold.ffont",
+                    "name": "TIME_FONT",
+                    "targetPlatforms": null,
+                    "type": "raw"
+                }
+            ]
         },
         "sdkVersion": "3",
         "targetPlatforms": [

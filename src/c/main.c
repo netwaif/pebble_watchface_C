@@ -10,12 +10,11 @@
 static void NULL_CALLBACK(){}
 static Layer  *s_layers_pointers[DEF_LAYERS_MAX];
 static Window *s_main_window;
-static EventHandle s_minutetick_eventhandle;
-static EventHandle s_secondtick_eventhandle;
 
 void tick_handler(struct tm *tick_time, TimeUnits units_changed){
 	LOG("TICK!");
 	layer_time_update_time(tick_time, s_layers_pointers[DEF_LAYERS_ORDER_TIME]);
+	layer_date_update_date(tick_time, s_layers_pointers[DEF_LAYERS_ORDER_DATE]);
 	#if !DEBUG //check for bluetooth status every tick when in production
 		bluetooth_refresh();
 		battery_bar_refresh();
@@ -27,10 +26,22 @@ void main_window_load(Window *window){
 		
 	Layer *root_layer = window_get_root_layer(window);
   GRect root_bounds = layer_get_bounds(root_layer);
-	//13 + 39 = 52 
-	s_layers_pointers[DEF_LAYERS_ORDER_TIME] = layer_time_create(root_bounds); 	//creating a time layer
-	s_layers_pointers[DEF_LAYERS_ORDER_BT] = layer_bluetooth_create(GRect(root_bounds.size.w/3,0,root_bounds.size.w/3,root_bounds.size.h/5)); 	//creating a bluetooth icon layer
-	s_layers_pointers[DEF_LAYERS_ORDER_BAT] = layer_battery_create(GRect(root_bounds.size.w/3,0,root_bounds.size.w/3,root_bounds.size.h/5)); 	//creating a battery icon layer
+	GRect layer_time_bounds = GRect(root_bounds.origin.x
+																	,root_bounds.origin.y+root_bounds.size.h/2-DEF_LAYER_TIME_HEIGHT
+																	,root_bounds.size.w
+																	,DEF_LAYER_TIME_HEIGHT);
+	s_layers_pointers[DEF_LAYERS_ORDER_TIME] = layer_time_create(layer_time_bounds); 	//creating a time layer DEF_LAYER_TIME_HEIGHT
+	GRect layer_date_bounds = GRect(root_bounds.origin.x
+																	,layer_time_bounds.origin.y-DEF_LAYER_DATE_HEIGHT
+																	,root_bounds.size.w
+																	,DEF_LAYER_DATE_HEIGHT);
+	//s_layers_pointers[DEF_LAYERS_ORDER_DATE] = layer_date_create(layer_date_bounds); 	//creating a DATE layer DEF_LAYER_DATE_HEIGHT
+	GRect layer_indicators_bounds = GRect(root_bounds.size.w/3
+																	,layer_date_bounds.origin.y-DEF_LAYER_INDICATORS_HEIGHT
+																	,root_bounds.size.w/3
+																	,DEF_LAYER_INDICATORS_HEIGHT);
+	s_layers_pointers[DEF_LAYERS_ORDER_BT] = layer_bluetooth_create(layer_indicators_bounds); 	//creating a bluetooth icon layer
+	s_layers_pointers[DEF_LAYERS_ORDER_BAT] = layer_battery_create(layer_indicators_bounds); 	//creating a battery icon layer
 	
 	for (int i = 0; i < DEF_LAYERS_MAX; i = i + 1){					//adding all created layers to the main window root layer
 		if (s_layers_pointers[i]!=NULL){											//in the order defined by #define contstants
@@ -45,7 +56,7 @@ void main_window_unload(Window *window){
 	//special destructors for bluetooth and battery layers
 	bluetooth_layer_destroy(s_layers_pointers[DEF_LAYERS_ORDER_BT]);
 	battery_bar_layer_destroy(s_layers_pointers[DEF_LAYERS_ORDER_BAT]);
-	layer_destroy_safe(s_layers_pointers[DEF_LAYERS_ORDER_TIME]);
+	layer_time_destroy(s_layers_pointers[DEF_LAYERS_ORDER_TIME]);
 
 }
 
@@ -82,11 +93,13 @@ void system_init(void) {
 	}
 	
 	s_main_window = main_window_init();
-	
-	s_minutetick_eventhandle = events_tick_timer_service_subscribe(MINUTE_UNIT, tick_handler);
-	
+		
 	#if DEBUG //subscribe to SECOND tick for debug info
-  	s_secondtick_eventhandle = events_tick_timer_service_subscribe(SECOND_UNIT, tick_handler);
+  	tick_timer_service_subscribe(SECOND_UNIT, tick_handler);
+		LOG("subscribed to SECOND_UNIT");
+	#else
+		tick_timer_service_subscribe(MINUTE_UNIT, tick_handler);		
+		LOG("subscribed to MINUTE_UNIT");
 	#endif
 	
 	LOG("system_init END");
@@ -95,10 +108,10 @@ void system_init(void) {
 void system_deinit(void) {
   LOG("system_DEinit START");	
 	
-	events_tick_timer_service_unsubscribe(s_minutetick_eventhandle);
+	tick_timer_service_unsubscribe();
 	
 	#if DEBUG //unsibscribe from SECOND tick handler in case of debug
-		events_tick_timer_service_unsubscribe(s_secondtick_eventhandle);
+		tick_timer_service_unsubscribe();
 	#endif
 	
 	window_destroy(s_main_window);
@@ -107,7 +120,11 @@ void system_deinit(void) {
 }
 
 int main(void) {
+	LOG("APP START");
   system_init();
+	LOG("entering APP_EVENT_LOOP!");
 	app_event_loop();
+	LOG("exiting APP_EVENT_LOOP!");
 	system_deinit();
+	LOG("APP END");
 }

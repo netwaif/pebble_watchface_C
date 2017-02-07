@@ -83,7 +83,7 @@ static void battery_bar_layer_update_callback(Layer *icon_layer, GContext* ctx) 
 
   if(data->is_charging) {
     graphics_context_set_stroke_color(ctx, data->color_charging);
-    gpath_draw_outline_antialiased(ctx, s_battery_bolt_path_ptr);
+    gpath_draw_outline(ctx, s_battery_bolt_path_ptr);
   } else {
     uint8_t width = ((data->charge_percent / 100.0) * 11.0);
     if(width < 12) {
@@ -101,8 +101,8 @@ void battery_bar_refresh() {
 // Create a set of default settings.
 static void battery_bar_set_defaults(BatteryBarSettings *data) {
   data->percent_font = fonts_get_system_font(FONT_KEY_GOTHIC_14);
-  data->percent_layer_rect = GRect(0, -1, 30, 15);
-  data->icon_layer_rect = GRect(31, 4, 17, 9);
+  data->percent_layer_rect = GRect(0, -1, 30, DEF_LAYER_INDICATORS_HEIGHT);
+  data->icon_layer_rect = GRect(31, 4, DEF_LAYER_INDICATORS_HEIGHT, 9);
   data->hide_percent = false;
   data->hide_icon = false;
   #ifdef PBL_COLOR
@@ -120,7 +120,7 @@ static void battery_bar_set_defaults(BatteryBarSettings *data) {
 
 // Create a new battery bar layer and start monitoring.
 Layer* layer_battery_create(GRect root_bounds) {
-  s_battery_container_layer = layer_create_with_data(GRect(root_bounds.origin.x+root_bounds.size.w-48, root_bounds.origin.y+root_bounds.size.h-15, 48, 15), sizeof(BatteryBarSettings));
+  s_battery_container_layer = layer_create_with_data(GRect(root_bounds.origin.x+root_bounds.size.w-48, root_bounds.origin.y+root_bounds.size.h-DEF_LAYER_INDICATORS_HEIGHT, 48, DEF_LAYER_INDICATORS_HEIGHT), sizeof(BatteryBarSettings));
 	layer_set_update_proc(s_battery_container_layer, battery_container_layer_update_callback);
   BatteryBarSettings *data = layer_get_data(s_battery_container_layer);
   battery_bar_set_defaults(data);

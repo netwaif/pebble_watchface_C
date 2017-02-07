@@ -1,6 +1,8 @@
 #include <pebble.h>
 #include "layer_bluetooth.h"
 #include <pebble-fctx/fctx.h>
+#include <pebble-fctx/fpath.h>
+#include <pebble-fctx/ffont.h>
 #include "config.h"
 
 typedef struct BluetoothIconSettings {

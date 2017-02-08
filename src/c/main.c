@@ -11,7 +11,6 @@
 #include "layer_events.h"
 #include "config.h"
 
-static void NULL_CALLBACK(){}
 static Layer  *s_layers_pointers[DEF_LAYERS_MAX];
 static Window *s_main_window;
 
@@ -20,26 +19,29 @@ void tick_handler(struct tm *tick_time, TimeUnits units_changed){
 	#if DEBUG
 		if (SECOND_UNIT & units_changed){
 			LOG("TICK SEC!");
-			layer_bg_update(s_layers_pointers[DEF_LAYERS_ORDER_BG]);  //explicitely request update of background (sets redraw flag to TRUE)
-			layer_busy_update(s_layers_pointers[DEF_LAYERS_ORDER_BUSY],tick_time);
-			layer_date_update_date(tick_time, s_layers_pointers[DEF_LAYERS_ORDER_DATE]); //requesting DATE redraw
-			layer_time_update_time(tick_time, s_layers_pointers[DEF_LAYERS_ORDER_TIME]); //reqeusting TIME redraw
-			bluetooth_refresh();  //explicitly request update of bluetooth status
-			battery_bar_refresh(); //explicitly request update of battery charge
+			if (tick_time->tm_sec % DEF_LAYER_BUSY_TICKER_INTERVAL==0){
+				LOG("TICK TICKER_INTERVAL (%d)!",DEF_LAYER_BUSY_TICKER_INTERVAL);
+				layer_bg_update(s_layers_pointers[DEF_LAYERS_ORDER_BG]);  //explicitely request update of background (sets redraw flag to TRUE)
+				layer_busy_update(s_layers_pointers[DEF_LAYERS_ORDER_BUSY],tick_time);
+				layer_date_update_date(tick_time, s_layers_pointers[DEF_LAYERS_ORDER_DATE]); //requesting DATE redraw
+				layer_time_update_time(tick_time, s_layers_pointers[DEF_LAYERS_ORDER_TIME]); //reqeusting TIME redraw
+				//bluetooth_refresh();  //explicitly request update of bluetooth status
+				//battery_bar_refresh(); //explicitly request update of battery charge
+			}
 		}
 	#endif
 	
 	if (MINUTE_UNIT & units_changed){
-		LOG("TICK MIN!");
-		layer_bg_update(s_layers_pointers[DEF_LAYERS_ORDER_BG]);  //explicitely request update of background (sets redraw flag to TRUE)
-		layer_busy_update(s_layers_pointers[DEF_LAYERS_ORDER_BUSY],tick_time);
+		if (tick_time->tm_min % DEF_LAYER_BUSY_TICKER_INTERVAL==0){
+			layer_bg_update(s_layers_pointers[DEF_LAYERS_ORDER_BG]);  //explicitely request update of background (sets redraw flag to TRUE)
+			layer_busy_update(s_layers_pointers[DEF_LAYERS_ORDER_BUSY],tick_time);	
+		}
 		layer_date_update_date(tick_time, s_layers_pointers[DEF_LAYERS_ORDER_DATE]); //requesting DATE redraw
 		layer_time_update_time(tick_time, s_layers_pointers[DEF_LAYERS_ORDER_TIME]);	  //reqeusting TIME redraw
 		//bluetooth_refresh();  //explicitly request update of bluetooth status
 		//battery_bar_refresh(); //explicitly request update of battery charge
 	}
 	if (DAY_UNIT & units_changed){
-		LOG("TICK DAY!");
 		layer_bg_update(s_layers_pointers[DEF_LAYERS_ORDER_BG]);  //explicitely request update of background (sets redraw flag to TRUE)
 		layer_date_update_date(tick_time, s_layers_pointers[DEF_LAYERS_ORDER_DATE]); //requesting DATE redraw
 	}

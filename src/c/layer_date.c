@@ -24,7 +24,6 @@ void layer_date_updater(Layer *layer, GContext *ctx){
 	//prepare the text to be displayed
 	char s_buffer[]="31 Oct, WED";
 	strftime(s_buffer, sizeof(s_buffer), "%d %b, %a", curr_time);
-	LOG(s_buffer);
 	
 	//init FCTX context
 	FContext fctx;

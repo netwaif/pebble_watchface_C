@@ -1,6 +1,8 @@
 #pragma once
 #include <pebble.h>
 
+void NULL_CALLBACK(){}
+
 #define DEBUG 1
 
 #define PBL_COLOR 1
@@ -25,6 +27,7 @@
 #define DEF_LAYER_DATE_FONT RESOURCE_ID_FONT_OPENSANS_BOLD
 #define DEF_LAYER_BATTERY_FONT FONT_KEY_GOTHIC_14
 
+#define DEF_LAYER_BUSY_TICKER_INTERVAL 12
 #define DEF_LAYER_BUSY_COLOR_AM GColorRed
 #define DEF_LAYER_BUSY_COLOR_PM GColorLightGray
 #define DEF_LAYER_BUSY_HAND_WIDTH 2

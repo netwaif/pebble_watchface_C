@@ -44,7 +44,6 @@ void layer_time_updater(Layer *layer, GContext *ctx){
 	
 	//prepare the text to be displayed
 	strftime(s_buffer, sizeof(s_buffer), clock_is_24h_style() ? "%H:%M" : "%I:%M", curr_time);
-	LOG(s_buffer);
 	#if DEBUG //display seconds in both fields for debug purpose
 		strftime(s_buffer, sizeof(s_buffer), clock_is_24h_style() ? "%S:%S" : "%S:%S", curr_time);
 	#endif

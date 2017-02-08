@@ -1,11 +1,11 @@
 #include <pebble.h>
 #include <pebble-fctx/fctx.h>
-#include <pebble-fctx/fpath.h>
 #include <pebble-fctx/ffont.h>
 #include "layer_time.h"
 #include "config.h"
 
 static FFont *s_time_font;
+static char s_buffer[7]="00:00";
 
 void layer_time_update_time(struct tm *tick_time, Layer *layer){
 	layer_updater_time_data * data = layer_get_data(layer);
@@ -17,15 +17,7 @@ void layer_time_updater(Layer *layer, GContext *ctx){
 	LOG("time layer UPDATER");
 	//extracting the data from layer_data
 	layer_updater_time_data * data = layer_get_data(layer);
-	//GRect prev_bounds = data->prev_bounds;
 	struct tm * curr_time = &data->curr_time;
-	//prepare the text to be displayed
-	char s_buffer[7];
-	strftime(s_buffer, sizeof(s_buffer), clock_is_24h_style() ? "%H:%M" : "%I:%M", curr_time);
-	#if DEBUG //display seconds in both fields for debug purpose
-		strftime(s_buffer, sizeof(s_buffer), clock_is_24h_style() ? "%S:%S" : "%S:%S", curr_time);
-		LOG(s_buffer);
-	#endif
 	
 	//init FCTX context
 	FContext fctx;
@@ -37,16 +29,30 @@ void layer_time_updater(Layer *layer, GContext *ctx){
 	fixed_t text_width = fctx_string_width(&fctx, s_buffer, s_time_font);
 	//get the text bounds based on text size and align it within layer_bounds
 	GRect text_bounds = GRect(layer_bounds.size.w/2-FIXED_TO_INT(text_width/2),0,FIXED_TO_INT(text_width),layer_bounds.size.h);
-	//clearing the text area based on text_bounds
-	graphics_context_set_fill_color(ctx, DEF_LAYER_BACKGROUND);
-	graphics_fill_rect(ctx, text_bounds, 0, GCornersAll);
+	
 	//getting the anchor point from local coords into FPoint coords for fctx
 	GPoint gAbsOffset = layer_convert_point_to_screen(layer, GPoint(text_bounds.origin.x+text_bounds.size.w/2 , text_bounds.origin.y+text_bounds.size.h-1));
 	FPoint fAbsOffset = FPoint(INT_TO_FIXED(gAbsOffset.x),INT_TO_FIXED(gAbsOffset.y));
-	fctx_set_offset(&fctx, fAbsOffset); 
+	fctx_set_offset(&fctx, fAbsOffset); 	
+	
+	//clearing the text area based on previous numbers
+	fctx_begin_fill(&fctx);
+	fctx_set_fill_color(&fctx, GColorWhite);
+	fctx_set_color_bias(&fctx, 8);
+	fctx_draw_string(&fctx, s_buffer, s_time_font, GTextAlignmentCenter, FTextAnchorBaseline);
+	fctx_end_fill(&fctx);
+	
+	//prepare the text to be displayed
+	strftime(s_buffer, sizeof(s_buffer), clock_is_24h_style() ? "%H:%M" : "%I:%M", curr_time);
+	LOG(s_buffer);
+	#if DEBUG //display seconds in both fields for debug purpose
+		strftime(s_buffer, sizeof(s_buffer), clock_is_24h_style() ? "%S:%S" : "%S:%S", curr_time);
+	#endif
+	
 	//draw the text.. finally...
 	fctx_begin_fill(&fctx);
 	fctx_set_fill_color(&fctx, DEF_LAYER_TIME_COLOR);
+	fctx_set_color_bias(&fctx, 0);
 	fctx_draw_string(&fctx, s_buffer, s_time_font, GTextAlignmentCenter, FTextAnchorBaseline);
 	fctx_end_fill(&fctx);
 	//deinit the fctx context

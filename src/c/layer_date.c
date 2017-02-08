@@ -1,19 +1,21 @@
 #include <pebble.h>
 #include <pebble-fctx/fctx.h>
-#include <pebble-fctx/fpath.h>
 #include <pebble-fctx/ffont.h>
 #include "layer_date.h"
 #include "config.h"
 
 static FFont *s_date_font;
+static bool s_redraw_flag = true;
 
 void layer_date_update_date(struct tm *tick_time, Layer *layer){
+	s_redraw_flag = true;  //set the flag to true when explicitly ordered to update/redraw
 	layer_updater_date_data * data = layer_get_data(layer);
 	data->curr_time = *tick_time;
 	layer_mark_dirty(layer);
 }
 
 void layer_date_updater(Layer *layer, GContext *ctx){
+	if (!s_redraw_flag){return;} // if the flag is FALSE - we DON'T redraw - just quit
 	LOG("date layer UPDATER");
 	//extracting the data from layer_data
 	layer_updater_date_data * data = layer_get_data(layer);
@@ -48,6 +50,8 @@ void layer_date_updater(Layer *layer, GContext *ctx){
 	fctx_end_fill(&fctx);
 	//deinit the fctx context
 	fctx_deinit_context(&fctx);
+	s_redraw_flag = false; //set the redraw flag t false, so that we don't redraw every time
+	
 	
 	#if DEBUG  //drawing the outline boarder of layer and text area according to its size
 		graphics_context_set_stroke_width(ctx, 1);
@@ -70,7 +74,7 @@ Layer * layer_date_create(GRect layer_bounds){
 	s_date_font = ffont_create_from_resource(DEF_LAYER_DATE_FONT);
 	//assign update handler for the layer
 	layer_set_update_proc(layer, layer_date_updater);
-	LOG("time layer CREATED");
+	LOG("date layer CREATED");
 	return layer;
 }
 

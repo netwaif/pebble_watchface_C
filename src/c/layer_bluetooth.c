@@ -1,8 +1,7 @@
 #include <pebble.h>
-#include "layer_bluetooth.h"
 #include <pebble-fctx/fctx.h>
-#include <pebble-fctx/fpath.h>
 #include <pebble-fctx/ffont.h>
+#include "layer_bluetooth.h"
 #include "config.h"
 
 typedef struct BluetoothIconSettings {
@@ -66,8 +65,10 @@ static void bluetooth_connection_callback(bool connected) {
 // Force the icon to refresh
 void bluetooth_refresh() {
   BluetoothIconSettings *data = layer_get_data(s_bluetooth_layer);
-	data->is_connected = connection_service_peek_pebble_app_connection();
-  bluetooth_connection_callback(data->is_connected);
+	bool connected = connection_service_peek_pebble_app_connection();
+  if (data->is_connected != connected){
+		bluetooth_connection_callback(connected);
+	}
 }
 
 // Create a set of default settings.

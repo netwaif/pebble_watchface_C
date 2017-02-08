@@ -7,6 +7,8 @@
 #include "layer_battery.h"
 #include "layer_bluetooth.h"
 #include "layer_bg.h"
+#include "layer_busy.h"
+#include "layer_events.h"
 #include "config.h"
 
 static void NULL_CALLBACK(){}
@@ -18,20 +20,28 @@ void tick_handler(struct tm *tick_time, TimeUnits units_changed){
 	#if DEBUG
 		if (SECOND_UNIT & units_changed){
 			LOG("TICK SEC!");
+			layer_bg_update(s_layers_pointers[DEF_LAYERS_ORDER_BG]);  //explicitely request update of background (sets redraw flag to TRUE)
+			layer_busy_update(s_layers_pointers[DEF_LAYERS_ORDER_BUSY],tick_time);
+			layer_date_update_date(tick_time, s_layers_pointers[DEF_LAYERS_ORDER_DATE]); //requesting DATE redraw
 			layer_time_update_time(tick_time, s_layers_pointers[DEF_LAYERS_ORDER_TIME]); //reqeusting TIME redraw
+			bluetooth_refresh();  //explicitly request update of bluetooth status
+			battery_bar_refresh(); //explicitly request update of battery charge
 		}
 	#endif
 	
 	if (MINUTE_UNIT & units_changed){
 		LOG("TICK MIN!");
+		layer_bg_update(s_layers_pointers[DEF_LAYERS_ORDER_BG]);  //explicitely request update of background (sets redraw flag to TRUE)
+		layer_busy_update(s_layers_pointers[DEF_LAYERS_ORDER_BUSY],tick_time);
+		layer_date_update_date(tick_time, s_layers_pointers[DEF_LAYERS_ORDER_DATE]); //requesting DATE redraw
 		layer_time_update_time(tick_time, s_layers_pointers[DEF_LAYERS_ORDER_TIME]);	  //reqeusting TIME redraw
 		//bluetooth_refresh();  //explicitly request update of bluetooth status
 		//battery_bar_refresh(); //explicitly request update of battery charge
 	}
 	if (DAY_UNIT & units_changed){
 		LOG("TICK DAY!");
-		layer_date_update_date(tick_time, s_layers_pointers[DEF_LAYERS_ORDER_DATE]); //requesting DATE redraw
 		layer_bg_update(s_layers_pointers[DEF_LAYERS_ORDER_BG]);  //explicitely request update of background (sets redraw flag to TRUE)
+		layer_date_update_date(tick_time, s_layers_pointers[DEF_LAYERS_ORDER_DATE]); //requesting DATE redraw
 	}
 }
 
@@ -60,6 +70,7 @@ void main_window_load(Window *window){
 	s_layers_pointers[DEF_LAYERS_ORDER_BT] = layer_bluetooth_create(layer_indicators_bounds); 	//creating a bluetooth icon layer
 	s_layers_pointers[DEF_LAYERS_ORDER_BAT] = layer_battery_create(layer_indicators_bounds); 	//creating a battery icon layer
 	s_layers_pointers[DEF_LAYERS_ORDER_BG] = layer_bg_create(root_bounds); //creating the background
+	s_layers_pointers[DEF_LAYERS_ORDER_BUSY] = layer_busy_create(root_bounds); //creating the layer for free/busy arcs
 	
 	for (int i = 0; i < DEF_LAYERS_MAX; i = i + 1){					//adding all created layers to the main window root layer
 		if (s_layers_pointers[i]!=NULL){											//in the order defined by #define contstants
@@ -76,6 +87,7 @@ void main_window_unload(Window *window){
 	layer_time_destroy(s_layers_pointers[DEF_LAYERS_ORDER_TIME]);
 	layer_date_destroy(s_layers_pointers[DEF_LAYERS_ORDER_DATE]);
 	layer_bg_destroy(s_layers_pointers[DEF_LAYERS_ORDER_BG]);
+	layer_busy_destroy(s_layers_pointers[DEF_LAYERS_ORDER_BUSY]);
 }
 
 void main_window_appear(Window *window){

@@ -15,7 +15,7 @@ void layer_date_update_date(struct tm *tick_time, Layer *layer){
 }
 
 void layer_date_updater(Layer *layer, GContext *ctx){
-	if (!s_redraw_flag){return;} // if the flag is FALSE - we DON'T redraw - just quit
+	if (!s_redraw_flag){return;}else{s_redraw_flag = false;} // if the flag is FALSE - we DON'T redraw - just quit
 	LOG("date layer UPDATER");
 	//extracting the data from layer_data
 	layer_updater_date_data * data = layer_get_data(layer);
@@ -50,8 +50,6 @@ void layer_date_updater(Layer *layer, GContext *ctx){
 	fctx_end_fill(&fctx);
 	//deinit the fctx context
 	fctx_deinit_context(&fctx);
-	s_redraw_flag = false; //set the redraw flag t false, so that we don't redraw every time
-	
 	
 	#if DEBUG  //drawing the outline boarder of layer and text area according to its size
 		graphics_context_set_stroke_width(ctx, 1);

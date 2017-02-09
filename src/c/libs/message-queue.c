@@ -1,9 +1,18 @@
+/***
+ * Message Queue
+ * Copyright © 2013 Matthew Tole
+ *
+ * Version 1.0.0
+ ***/
+
 #include <pebble.h>
 #include "message-queue.h"
 
+#define KEY_GROUP 0
+#define KEY_OPERATION 1
+#define KEY_DATA 2
 
 #define ATTEMPT_COUNT 2
-
 
 typedef struct {
   char* group;
@@ -25,35 +34,24 @@ struct HandlerQueue {
   HandlerQueue* next;
 };
 
-
 static void destroy_message_queue(MessageQueue* queue);
 static void outbox_sent_callback(DictionaryIterator *iterator, void *context);
 static void outbox_failed_callback(DictionaryIterator *iterator, AppMessageResult reason, void *context);
 static void inbox_received_callback(DictionaryIterator *iterator, void *context);
 static void send_next_message();
+static void send_timer_callback(void* context);
 static char *translate_error(AppMessageResult result);
-
 
 static MessageQueue* msg_queue = NULL;
 static HandlerQueue* handler_queue = NULL;
 static bool sending = false;
 static bool can_send = false;
-static bool s_autostart = false;
 
-
-void mqueue_init(bool autostart) {
-  mqueue_init_custom(autostart, app_message_inbox_size_maximum(), app_message_outbox_size_maximum());
-}
-
-void mqueue_init_custom(bool autostart, uint16_t inbox_size, uint16_t outbox_size) {
-  AppMessageResult result = app_message_open(inbox_size, outbox_size);
-  if (APP_MSG_OK != result) {
-    APP_LOG(APP_LOG_LEVEL_DEBUG, "INIT ERROR: %s", translate_error(result));
-  }
+void mqueue_init(void) {
+  AppMessageResult result = app_message_open(1024, 256);
   app_message_register_outbox_sent(outbox_sent_callback);
   app_message_register_outbox_failed(outbox_failed_callback);
   app_message_register_inbox_received(inbox_received_callback);
-  s_autostart = autostart;
 }
 
 bool mqueue_add(char* group, char* operation, char* data) {
@@ -93,6 +91,7 @@ void mqueue_register_handler(char* group, MessageHandler handler) {
   hq->group = malloc(strlen(group) + 1);
   strcpy(hq->group, group);
   hq->handler = handler;
+  printf("%p", handler_queue);
 
   if (handler_queue == NULL) {
     handler_queue = hq;
@@ -104,6 +103,7 @@ void mqueue_register_handler(char* group, MessageHandler handler) {
     }
     eoq->next = hq;
   }
+  printf("%p", handler_queue);
 }
 
 void mqueue_enable_sending(void) {
@@ -111,6 +111,7 @@ void mqueue_enable_sending(void) {
   send_next_message();
 }
 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - //
 
 static void outbox_sent_callback(DictionaryIterator *iterator, void *context) {
   sending = false;
@@ -118,20 +119,22 @@ static void outbox_sent_callback(DictionaryIterator *iterator, void *context) {
   APP_LOG(APP_LOG_LEVEL_DEBUG, "SENT: %s, %s, %s", sent->message->group, sent->message->operation, sent->message->data);
   msg_queue = msg_queue->next;
   destroy_message_queue(sent);
-  send_next_message();
+  app_timer_register(500, send_timer_callback, NULL);
 }
 
 static void outbox_failed_callback(DictionaryIterator *iterator, AppMessageResult reason, void *context) {
   sending = false;
   APP_LOG(APP_LOG_LEVEL_DEBUG, "ERROR: %s, %s, %s", msg_queue->message->group, msg_queue->message->operation, msg_queue->message->data);
   APP_LOG(APP_LOG_LEVEL_DEBUG, "%s", translate_error(reason));
-  send_next_message();
+  app_timer_register(500, send_timer_callback, NULL);
 }
 
 static void inbox_received_callback(DictionaryIterator *iterator, void *context) {
-  char* group = dict_find(iterator, MESSAGE_KEY_GROUP)->value->cstring;
-  char* operation = dict_find(iterator, MESSAGE_KEY_OPERATION)->value->cstring;
-  char* data = dict_find(iterator, MESSAGE_KEY_DATA)->value->cstring;
+  char* group = dict_find(iterator, KEY_GROUP)->value->cstring;
+  char* operation = dict_find(iterator, KEY_OPERATION)->value->cstring;
+  char* data = dict_find(iterator, KEY_DATA)->value->cstring;
+
+  printf("%s, %s, %s", group, operation, data);
 
   HandlerQueue* hq = handler_queue;
   while (hq != NULL) {
@@ -141,9 +144,7 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
     hq = hq->next;
   }
 
-  if (! can_send && s_autostart) {
-    mqueue_enable_sending();
-  }
+  mqueue_enable_sending();
 }
 
 static void destroy_message_queue(MessageQueue* queue) {
@@ -156,6 +157,7 @@ static void destroy_message_queue(MessageQueue* queue) {
 
 static void send_next_message() {
   if (! can_send) {
+    printf("Cannot send");
     return;
   }
 
@@ -181,9 +183,9 @@ static void send_next_message() {
 
   DictionaryIterator* dict;
   app_message_outbox_begin(&dict);
-  dict_write_cstring(dict, MESSAGE_KEY_GROUP, mq->message->group);
-  dict_write_cstring(dict, MESSAGE_KEY_DATA, mq->message->data);
-  dict_write_cstring(dict, MESSAGE_KEY_OPERATION, mq->message->operation);
+  dict_write_cstring(dict, KEY_GROUP, mq->message->group);
+  dict_write_cstring(dict, KEY_DATA, mq->message->data);
+  dict_write_cstring(dict, KEY_OPERATION, mq->message->operation);
   AppMessageResult result = app_message_outbox_send();
   APP_LOG(APP_LOG_LEVEL_DEBUG, "%s", translate_error(result));
   mq->attempts_left -= 1;
@@ -207,4 +209,8 @@ static char *translate_error(AppMessageResult result) {
     case APP_MSG_INTERNAL_ERROR: return "APP_MSG_INTERNAL_ERROR";
     default: return "UNKNOWN ERROR";
   }
+}
+
+static void send_timer_callback(void* context) {
+  send_next_message();
 }

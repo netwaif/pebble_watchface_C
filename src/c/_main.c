@@ -13,6 +13,7 @@
 
 static Layer  *s_layers_pointers[DEF_LAYERS_MAX];
 static Window *s_main_window;
+void NULL_CALLBACK(){}
 
 void tick_handler(struct tm *tick_time, TimeUnits units_changed){
 	

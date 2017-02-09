@@ -1,8 +1,6 @@
 #pragma once
 #include <pebble.h>
 
-void NULL_CALLBACK(){}
-
 #define DEBUG 1
 
 #define PBL_COLOR 1

@@ -2,7 +2,7 @@
 #include <pebble-fctx/fctx.h>
 #include <pebble-fctx/ffont.h>
 #include "layer_battery.h"
-#include "src/c/_config.h"
+#include "src/c/config.h"
 
 typedef struct BatteryBarSettings {
   bool is_charging;

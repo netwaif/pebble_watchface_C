@@ -9,7 +9,7 @@
 #include "layers/layer_bg.h"
 #include "layers/layer_busy.h"
 #include "layers/layer_events.h"
-#include "_config.h"
+#include "config.h"
 
 static Layer  *s_layers_pointers[DEF_LAYERS_MAX];
 static Window *s_main_window;

@@ -2,7 +2,7 @@
 #include <pebble-fctx/fctx.h>
 #include <pebble-fctx/ffont.h>
 #include "layer_time.h"
-#include "config.h"
+#include "src/c/_config.h"
 
 static FFont *s_time_font;
 static char s_buffer[7]="00:00";

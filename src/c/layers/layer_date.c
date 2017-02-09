@@ -2,7 +2,7 @@
 #include <pebble-fctx/fctx.h>
 #include <pebble-fctx/ffont.h>
 #include "layer_date.h"
-#include "config.h"
+#include "src/c/_config.h"
 
 static FFont *s_date_font;
 static bool s_redraw_flag = true;

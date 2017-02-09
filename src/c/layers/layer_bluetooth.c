@@ -2,7 +2,7 @@
 #include <pebble-fctx/fctx.h>
 #include <pebble-fctx/ffont.h>
 #include "layer_bluetooth.h"
-#include "config.h"
+#include "src/c/_config.h"
 
 typedef struct BluetoothIconSettings {
   bool vibe_disconnect;

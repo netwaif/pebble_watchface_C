@@ -1,9 +1,11 @@
 #include <pebble.h>
 #include "message-queue.h"
 
+#define MESSAGE_KEY_GROUP 0
+#define MESSAGE_KEY_OPERATION 1
+#define MESSAGE_KEY_DATA 2
 
 #define ATTEMPT_COUNT 2
-
 
 typedef struct {
   char* group;

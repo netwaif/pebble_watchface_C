@@ -1,6 +1,6 @@
 #include <pebble.h>
 #include <pebble-fctx/fctx.h>
-#include "config.h"
+#include "src/c/_config.h"
 #include "graphics.h"
 
 void draw_hand(FContext *fctx, int center_x, int center_y, int inner_r, int outer_r, int width, int seconds, GColor color){

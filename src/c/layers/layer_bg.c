@@ -1,8 +1,8 @@
 #include <pebble.h>
 #include <pebble-fctx/fctx.h>
 #include "layer_bg.h"
-#include "config.h"
-#include "graphics.h"
+#include "src/c/_config.h"
+#include "src/c/modules/graphics.h"
 
 static bool s_redraw_flag = true;
 

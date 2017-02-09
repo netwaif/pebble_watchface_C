@@ -19,22 +19,8 @@
         "resources": {
             "media": [
                 {
-                    "file": "data/FONT_OPENSANS_BOLD",
-                    "name": "FONT_OPENSANS_BOLD",
-                    "targetPlatforms": null,
-                    "type": "raw"
-                },
-                {
                     "file": "data/FONT_ROBOTO_BOLD_NUM",
                     "name": "FONT_ROBOTO_BOLD_NUM",
-                    "targetPlatforms": [
-                        "chalk"
-                    ],
-                    "type": "raw"
-                },
-                {
-                    "file": "data/FONT_ARIAL",
-                    "name": "FONT_ARIAL",
                     "targetPlatforms": [
                         "chalk"
                     ],
@@ -45,6 +31,20 @@
                     "name": "FONT_OPENSANS_LIGHT",
                     "targetPlatforms": null,
                     "type": "raw"
+                },
+                {
+                    "file": "data/FONT_OPENSANS_BOLD",
+                    "name": "FONT_OPENSANS_BOLD",
+                    "targetPlatforms": null,
+                    "type": "raw"
+                },
+                {
+                    "file": "data/FONT_ARIAL",
+                    "name": "FONT_ARIAL",
+                    "targetPlatforms": [
+                        "chalk"
+                    ],
+                    "type": "raw"
                 }
             ]
         },
@@ -52,7 +52,7 @@
         "targetPlatforms": [
             "chalk"
         ],
-        "uuid": "16cab976-99f0-4bd0-b30e-ed097a4b20c8",
+        "uuid": "70d39fdf-fbe8-4a13-b247-578b13c425bd",
         "watchapp": {
             "watchface": true
         }

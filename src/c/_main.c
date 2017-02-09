@@ -2,17 +2,18 @@
 #include <pebble-helpers/pebble-helpers.h>
 #include <pebble-events/pebble-events.h>
 #include <pebble-packet/pebble-packet.h>
-#include "layer_time.h"
-#include "layer_date.h"
-#include "layer_battery.h"
-#include "layer_bluetooth.h"
-#include "layer_bg.h"
-#include "layer_busy.h"
-#include "layer_events.h"
-#include "config.h"
+#include "layers/layer_time.h"
+#include "layers/layer_date.h"
+#include "layers/layer_battery.h"
+#include "layers/layer_bluetooth.h"
+#include "layers/layer_bg.h"
+#include "layers/layer_busy.h"
+#include "layers/layer_events.h"
+#include "_config.h"
 
 static Layer  *s_layers_pointers[DEF_LAYERS_MAX];
 static Window *s_main_window;
+void NULL_CALLBACK(){}
 
 void tick_handler(struct tm *tick_time, TimeUnits units_changed){
 	

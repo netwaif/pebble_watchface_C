@@ -1,8 +1,8 @@
 #include <pebble.h>
 #include <pebble-fctx/fctx.h>
 #include "layer_busy.h"
-#include "src/c/config.h"
 #include "src/c/modules/graphics.h"
+#include "src/c/config.h"
 
 static bool s_redraw_flag = true;
 static struct tm s_current_time;
@@ -15,6 +15,8 @@ typedef struct events {
 static struct events free_busy[]={
 	{4,15},{24,35},{47,68},{80,98},{104,135}
 };
+
+
 
 int free_busy_length = 5;
 

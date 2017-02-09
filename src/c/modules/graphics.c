@@ -21,26 +21,29 @@ void draw_hand(FContext *fctx, int center_x, int center_y, int inner_r, int oute
 }
 
 void draw_arc(FContext *fctx, int center_x, int center_y, int inner_r, int outer_r, int seconds_start, int seconds_end, GColor color){
-	seconds_start -= 15;  //offsetting because angles start at 15 seconds mark
-	seconds_end -= 15;
-	int32_t angle_step = TRIG_MAX_ANGLE / 120; //use half-step for smoothness
+	int steps = DEF_LAYER_BUSY_ARC_SEGMENTS * (seconds_end-seconds_start);  //dividing into more steps for better quality rendering
+	int32_t angle_step = TRIG_MAX_ANGLE / (60 * DEF_LAYER_BUSY_ARC_SEGMENTS); //use half-step for smoothness
+	int32_t curr_angle = TRIG_MAX_ANGLE * (seconds_start-15) / 60; //offsetting for Pi/2
+	
 	fctx_begin_fill(fctx);
 	fctx_set_fill_color(fctx, color);
 	fctx_set_offset(fctx, FPointI(center_x,center_y));
  	fctx_set_scale(fctx, FPointOne, FPointOne);
-	for (int i = seconds_start; i < seconds_end; i=i+1){
-		int32_t curr_angle = TRIG_MAX_ANGLE * i / 60;
+	
+	fctx_set_rotation(fctx, curr_angle);
+	fctx_move_to(fctx, FPoint(INT_TO_FIXED(inner_r), 0));
+	fctx_line_to(fctx, FPoint(INT_TO_FIXED(outer_r), 0));
+	for (int i = 0; i < steps; i=i+1){ //draw outer arc
+		curr_angle += angle_step;
 		fctx_set_rotation(fctx, curr_angle);
-		fctx_move_to(fctx, FPoint(INT_TO_FIXED(inner_r), 0));
 		fctx_line_to(fctx, FPoint(INT_TO_FIXED(outer_r), 0));
-		fctx_set_rotation(fctx, curr_angle+angle_step);
-		fctx_line_to(fctx, FPoint(INT_TO_FIXED(outer_r), 0));
-		fctx_set_rotation(fctx, curr_angle+2*angle_step);
-		fctx_line_to(fctx, FPoint(INT_TO_FIXED(outer_r), 0));
-		fctx_line_to(fctx, FPoint(INT_TO_FIXED(inner_r), 0));
-		fctx_set_rotation(fctx, curr_angle+angle_step);
-		fctx_line_to(fctx, FPoint(INT_TO_FIXED(inner_r), 0));
-		fctx_close_path(fctx);
 	}
+	fctx_line_to(fctx, FPoint(INT_TO_FIXED(inner_r), 0)); //go to drawing inner arc
+	for (int i = 0; i < steps; i=i+1){ //draw inner arc
+		curr_angle -= angle_step;
+		fctx_set_rotation(fctx, curr_angle);
+		fctx_line_to(fctx, FPoint(INT_TO_FIXED(inner_r), 0));
+	}
+	fctx_close_path(fctx);
 	fctx_end_fill(fctx);
 }

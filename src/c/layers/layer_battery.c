@@ -39,16 +39,26 @@ static void battery_bar_battery_update(BatteryChargeState charge_state) {
   if(data->charge_percent == 0) {
     data->charge_percent = 1;
   }
+	
+	//change the BlueTooth sniff interval if the power changes
+	SniffInterval sniff_int = app_comm_get_sniff_interval();
+	if ( (sniff_int==SNIFF_INTERVAL_NORMAL) && (data->charge_percent <= 30) ){
+		app_comm_set_sniff_interval(SNIFF_INTERVAL_REDUCED);
+	}else if ((sniff_int==SNIFF_INTERVAL_REDUCED) && (data->charge_percent  > 30) ){
+		app_comm_set_sniff_interval(SNIFF_INTERVAL_NORMAL);
+	}
 
+	//change icon color based on the charge
   if(data->charge_percent < 20) {
     data->color_state = data->color_danger;
-  } else if(data->charge_percent < 30) {
+  } else if(data->charge_percent <= 30) {
     data->color_state = data->color_warning;
   } else {
     data->color_state = data->color_normal;
   }
-
-  static char s_txt[5];
+	
+	//prepare the text of charge
+	static char s_txt[5];
   snprintf(s_txt, sizeof(s_txt), "%u%%", data->charge_percent);
   text_layer_set_text(s_battery_percent_layer, s_txt);
   text_layer_set_text_color(s_battery_percent_layer, data->color_state);

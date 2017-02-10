@@ -12,13 +12,11 @@ typedef struct events {
    int end;
 } event;
 
-static struct events free_busy[]={
-	{4,15},{24,35},{47,68},{80,98},{104,135}
+static struct events free_busy[50]={
+	{-5,4},{8,15},{24,35},{47,68},{80,98},{104,135}
 };
 
-
-
-int free_busy_length = 5;
+static int free_busy_length = 6;
 
 void layer_busy_updater(Layer *layer, GContext *ctx){
 	if (!s_redraw_flag){return;}else{s_redraw_flag = false;} // if the flag is FALSE - we DON'T redraw - just quit
@@ -50,7 +48,7 @@ void layer_busy_updater(Layer *layer, GContext *ctx){
 		//CanvasRenderingContext2D.rockyFillRadial(x, y, innerRadius, outerRadius, startAngle, endAngle)
 		
 		if (free_busy[i].end < 60){
-			draw_arc(&fctx, center_x , center_y , innerRadius , outerRadius, MAX(angle,free_busy[i].start),  free_busy[i].end, DEF_LAYER_BUSY_COLOR_AM);
+			draw_arc(&fctx, center_x , center_y , innerRadius , outerRadius, MAX(angle,MAX(0,free_busy[i].start)),  free_busy[i].end, DEF_LAYER_BUSY_COLOR_AM);
 		}else if(free_busy[i].start < 120){
 			if (free_busy[i].start < 60){
 				draw_arc(&fctx, center_x , center_y , innerRadius , outerRadius, MAX(free_busy[i].start, angle), 60, DEF_LAYER_BUSY_COLOR_AM);

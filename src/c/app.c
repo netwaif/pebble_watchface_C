@@ -1,5 +1,4 @@
 #include <pebble.h>
-#include "src/c/libs/pebble-events.h"
 #include "src/c/libs/message-queue.h"
 #include "layers/layer_time.h"
 #include "layers/layer_date.h"
@@ -8,7 +7,7 @@
 #include "layers/layer_bg.h"
 #include "layers/layer_busy.h"
 #include "layers/layer_events.h"
-#include "config.h"	
+#include "config.h"
 
 static Layer  *s_layers_pointers[DEF_LAYERS_MAX];
 static Window *s_main_window;

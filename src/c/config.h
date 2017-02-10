@@ -25,7 +25,7 @@
 #define DEF_LAYER_DATE_FONT RESOURCE_ID_FONT_OPENSANS_BOLD
 #define DEF_LAYER_BATTERY_FONT FONT_KEY_GOTHIC_14
 
-#define DEF_LAYER_BUSY_ARC_SEGMENTS 1
+#define DEF_LAYER_BUSY_ARC_SEGMENTS 1 //number of segment per 1 Second interval
 #define DEF_LAYER_BUSY_TICKER_INTERVAL 1
 #define DEF_LAYER_BUSY_COLOR_AM GColorRed
 #define DEF_LAYER_BUSY_COLOR_PM GColorLightGray
@@ -45,6 +45,8 @@
 #define persist_read_int_safe(key, value) (persist_exists(key) ? persist_read_int(key) : value);
 #define persist_read_bool_safe(key, value) (persist_exists(key) ? persist_read_bool(key) : value);
 #define persist_read_data_safe(key) (persist_exists(key) ? persist_read_bool(key) : 0);
+
+#define MAX3(a,b,c) (a>b?(a>c?a:c):(b>c?b:c))
 
 #define MAX(a,b) \
   ({ __typeof__ (a) _a = (a); \

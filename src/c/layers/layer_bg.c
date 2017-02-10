@@ -1,5 +1,5 @@
 #include <pebble.h>
-#include "src/c/libs/fctx.h" 
+#include "src/c/libs/fctx.h"
 #include "layer_bg.h"
 #include "src/c/config.h"
 #include "src/c/modules/graphics.h"
@@ -31,6 +31,7 @@ void layer_bg_updater(Layer *layer, GContext *ctx){
 		draw_hand(&fctx, bounds.size.w/2, bounds.size.h/2, bounds.size.w/2-l, bounds.size.w/2, w, i , DEF_LAYER_BG_COLOR);
 	}
 	fctx_deinit_context(&fctx);
+	LOG("BG layer UPDATER done!");
 }
 
 void layer_bg_update(Layer *layer){

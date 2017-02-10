@@ -1,2 +1,2 @@
-import MessageQueue from "lib/js-message-queue.js";
-var secrets = require("./secrets");
+//import MessageQueue from "lib/js-message-queue.js";
+//var secrets = require("./secrets");

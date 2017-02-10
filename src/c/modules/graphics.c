@@ -1,6 +1,7 @@
 #include <pebble.h>
 #include "src/c/libs/fctx.h"
-#include "src/c/config.h" 
+#include "src/c/libs/fpath.h"
+#include "src/c/config.h"
 #include "graphics.h"
 
 void draw_hand(FContext *fctx, int center_x, int center_y, int inner_r, int outer_r, int width, int seconds, GColor color){
@@ -21,10 +22,17 @@ void draw_hand(FContext *fctx, int center_x, int center_y, int inner_r, int oute
 }
 
 void draw_arc(FContext *fctx, int center_x, int center_y, int inner_r, int outer_r, int seconds_start, int seconds_end, GColor color){
+	if (seconds_start >= seconds_end){
+		//LOG("NOT drawing arc: seconds_start=%d < seconds_end=%d",seconds_start,seconds_end);
+		return;
+	}
 	int steps = DEF_LAYER_BUSY_ARC_SEGMENTS * (seconds_end-seconds_start);  //dividing into more steps for better quality rendering
 	int32_t angle_step = TRIG_MAX_ANGLE / (60 * DEF_LAYER_BUSY_ARC_SEGMENTS); //use half-step for smoothness
 	int32_t curr_angle = TRIG_MAX_ANGLE * (seconds_start-15) / 60; //offsetting for Pi/2
-	
+		
+	//LOG("drawing arc: seconds_start=%d  seconds_end=%d",seconds_start,seconds_end);
+	//LOG("drawing arc: curr_angle=%d steps=%d angle_step=%d",curr_angle,steps,angle_step);
+		
 	fctx_begin_fill(fctx);
 	fctx_set_fill_color(fctx, color);
 	fctx_set_offset(fctx, FPointI(center_x,center_y));

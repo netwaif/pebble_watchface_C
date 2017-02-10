@@ -41,6 +41,11 @@
 #define DEF_LAYER_BG_S_WID 1
 #define DEF_LAYER_BG_S_LEN 7
 
+#define free_safe(ptr) if (NULL != ptr) { LOG("Free Safe: %p", ptr); free(ptr); ptr = NULL; }
+#define persist_read_int_safe(key, value) (persist_exists(key) ? persist_read_int(key) : value);
+#define persist_read_bool_safe(key, value) (persist_exists(key) ? persist_read_bool(key) : value);
+#define persist_read_data_safe(key) (persist_exists(key) ? persist_read_bool(key) : 0);
+
 #define MAX(a,b) \
   ({ __typeof__ (a) _a = (a); \
       __typeof__ (b) _b = (b); \

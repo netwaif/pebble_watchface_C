@@ -2,7 +2,7 @@
 #include "fctx.h"
 #include "ffont.h"
 #include <stdlib.h>
-#include <pebble-utf8/pebble-utf8.h>
+#include "pebble-utf8.h"
 
 /*
  * Credit where credit is due:

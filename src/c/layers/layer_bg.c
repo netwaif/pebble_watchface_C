@@ -1,5 +1,5 @@
 #include <pebble.h>
-#include <pebble-fctx/fctx.h>
+#include "src/c/libs/fctx.h" 
 #include "layer_bg.h"
 #include "src/c/config.h"
 #include "src/c/modules/graphics.h"

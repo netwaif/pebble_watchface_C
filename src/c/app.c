@@ -1,7 +1,6 @@
 #include <pebble.h>
-#include <pebble-helpers/pebble-helpers.h>
-#include <pebble-events/pebble-events.h>
-#include <pebble-packet/pebble-packet.h>
+#include "src/c/libs/pebble-events.h"
+#include "src/c/libs/message-queue.h"
 #include "layers/layer_time.h"
 #include "layers/layer_date.h"
 #include "layers/layer_battery.h"
@@ -121,6 +120,7 @@ void system_init(void) {
 	for (char i = 1; i <= DEF_LAYERS_MAX; i = i + 1){
 		s_layers_pointers[i-1] = NULL;
 	}
+	mqueue_init(true);
 	s_main_window = main_window_init();
 	#if !DEBUG //subscribe to MINUTE tick for production mode
 		tick_timer_service_subscribe(DAY_UNIT+MINUTE_UNIT, tick_handler);		
@@ -132,7 +132,8 @@ void system_init(void) {
 }
 
 void system_deinit(void) {
-  LOG("system_DEinit START");	
+  LOG("system_DEinit START");
+	app_message_deregister_callbacks();
 	tick_timer_service_unsubscribe();
 	window_destroy(s_main_window);
 	LOG("system_DEinit END");

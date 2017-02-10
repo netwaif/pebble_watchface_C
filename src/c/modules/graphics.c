@@ -1,6 +1,6 @@
 #include <pebble.h>
-#include "src/c/libs/fctx.h"
-#include "src/c/libs/fpath.h"
+#include <pebble-fctx/fctx.h>
+#include <pebble-fctx/fpath.h>
 #include "src/c/config.h"
 #include "graphics.h"
 

@@ -1,5 +1,5 @@
 #include <pebble.h>
-#include "src/c/libs/fctx.h"
+#include <pebble-fctx/fctx.h>
 #include "src/c/config.h"
 #include "layer_busy.h"
 #include "src/c/libs/data-processor.h"
@@ -11,9 +11,11 @@
 #define DEF_PERSIST_BUSY_LEN_KEY 0
 #define DEF_PERSIST_BUSY_ARR_KEY 1
 
+static Layer* s_layer_busy = NULL;
 static bool s_redraw_flag = true;
+static bool s_requested_update = false;
 static struct tm s_current_time;
-	
+
 typedef struct _event {
    int start;
    int end;
@@ -22,22 +24,8 @@ typedef struct _event {
 static event* s_events = NULL;
 static int    s_events_length = 0;
 
-void layer_busy_msg_handler(char* operation, char* data){
-	if (strcmp(operation, "UPDATE") == 0) {
-    		
-  }
-  else{
-    LOG("unknown OPERATION!");
-  }
-}
-
 static void* layer_busy_events_destory_safe(event *arr, int *len){
 	if (NULL==arr){*len=0;return NULL;}
-//	for (uint8_t d = 0; d < *len; d += 1) {
-    //free_safe(arr[d]->start);
-		//free_safe(arr[d]->end);
-//    free_safe(arr[d]);
-//  }
   free_safe(arr);
   *len = 0;
 	return NULL;
@@ -46,35 +34,58 @@ static void* layer_busy_events_destory_safe(event *arr, int *len){
 static event* layer_busy_events_init_safe(int *len){
 	event* arr = malloc(*len * sizeof(event));
 	LOG("allocated %dB at %d",(*len * sizeof(event)),arr);
-//	for (uint8_t d = 0; d < *len; d += 1) {
-//    arr[d] = malloc(sizeof(event));
-		//e->start = malloc(sizeof(int));
-		//e->end = malloc(sizeof(int));
-		//arr[d] = e;
-//  }
 	return arr;
 }
 
-static void layer_busy_events_update(){
-	//gets the new data into persitent
+void layer_busy_msg_handler(char* operation, char* data){
+	if (strcmp(operation, "UPDATE") == 0) {
+		s_requested_update = false;
+  	s_events = layer_busy_events_destory_safe(s_events, &s_events_length);
+		ProcessingState* parser = data_processor_create(data, '|');
+		s_events_length = data_processor_get_int(parser);
+		s_events = layer_busy_events_init_safe(&s_events_length);
+		persist_write_int(DEF_PERSIST_BUSY_LEN_KEY, s_events_length);
+		persist_write_string(DEF_PERSIST_BUSY_ARR_KEY, data);
+		LOG("parse_string: START parsing of %d from %s", s_events_length, data);
+		for (int i=0; i<s_events_length; i+=1){
+			int s = data_processor_get_int(parser);
+			int e = data_processor_get_int(parser);
+			//LOG("parsed: s=%d, e=%d",s,e);
+			s_events[i].start = s;
+			s_events[i].end = e;
+		}
+		LOG("parse_string: parsing END, parsed %d of %d", 2*s_events_length, data_processor_count(parser)-1);
+		data_processor_destroy(parser);
+		layer_mark_dirty(s_layer_busy);
+  }
+  else{
+    LOG("unknown OPERATION!");
+  }
+}
+
+
+void layer_busy_events_update(){
+	//requests the new data from mobile
+	if (!s_requested_update){
+		mqueue_add(DEF_LAYER_BUSY_MSG_GROUP, "REQUEST", "");
+		s_requested_update = true;
+	}
 }
 
 static void layer_busy_events_parse_string(char *str, event *arr, int *len){
-	LOG("parse_string: parsing START to %d", arr);
 	ProcessingState* parser = data_processor_create(str, '|');
 	int l = data_processor_get_int(parser);
-	LOG("parsed=%d, passed=%d",l,*len);
+	LOG("parse_string: START parsing of %d/%d from %s", l, *len, str);
 	if (l!=*len){*len = l;}
 	for (int i=0; i<l; i+=1){
 		int s = data_processor_get_int(parser);
 		int e = data_processor_get_int(parser);
-		LOG("parsed: s=%d, e=%d",s,e);
+		//LOG("parsed: s=%d, e=%d",s,e);
 		arr[i].start = s;
 		arr[i].end = e;
 	}
-	LOG("parsed %d, out of %d", 2*l, data_processor_count(parser)-1);
+	LOG("parse_string: parsing END, parsed %d of %d", 2*l, data_processor_count(parser)-1);
 	data_processor_destroy(parser);
-	LOG("parse_string: parsing END");
 }
 
 void layer_busy_persist_load(event *arr, int *len){
@@ -86,25 +97,20 @@ void layer_busy_persist_load(event *arr, int *len){
 		if (*len!=0){		
 			s_events = layer_busy_events_init_safe(len);
 			char *buff = malloc(DEF_LAYER_BUSY_STR_LEN_MAX);
-			int res = persist_read_data(DEF_PERSIST_BUSY_ARR_KEY, buff, DEF_LAYER_BUSY_STR_LEN_MAX);
+			int res = persist_read_string(DEF_PERSIST_BUSY_ARR_KEY, buff, DEF_LAYER_BUSY_STR_LEN_MAX);
 			LOG("layer_busy_persist_load: read=%dB", res);
 			layer_busy_events_parse_string(buff, s_events, len);
+			free(buff);
 		}
 	}
 }
 
-void layer_busy_persist_save(event *arr, int *len){
-	int res = persist_write_int(DEF_PERSIST_BUSY_LEN_KEY, *len);
-	res = persist_write_data(DEF_PERSIST_BUSY_ARR_KEY, arr, DEF_LAYER_BUSY_STR_LEN_MAX);
-	LOG("layer_busy_persist_save: saved=%dB supposed=%dB", res,(*len)*sizeof(event));
-}
-
 Layer * layer_busy_create(GRect layer_bounds){
 	//create the layer
-	Layer * layer = layer_create(layer_bounds);
+	s_layer_busy = layer_create(layer_bounds);
 	
 	#if DEBUG
-		char *debug_str = "6|1|4|8|15|24|35|47|68|80|98|104|135";
+		char *debug_str = "6|0|1|10|11|20|21|30|31|40|41|50|51";
 		persist_write_int(DEF_PERSIST_BUSY_LEN_KEY, 6);
 		persist_write_string(DEF_PERSIST_BUSY_ARR_KEY, debug_str);
 	#endif
@@ -117,13 +123,13 @@ Layer * layer_busy_create(GRect layer_bounds){
 	s_current_time = *localtime(&start);
 	
 	//assign update handler for the layer
-	layer_set_update_proc(layer, layer_busy_updater);
+	layer_set_update_proc(s_layer_busy, layer_busy_updater);
 	LOG("BUSY layer CREATED");
 	
 	//assign message handler for the layer
-	//mqueue_register_handler(DEF_LAYER_BUSY_MSG_GROUP, layer_busy_msg_handler);
+	mqueue_register_handler(DEF_LAYER_BUSY_MSG_GROUP, layer_busy_msg_handler);
 	
-	return layer;
+	return s_layer_busy;
 }
 
 void layer_busy_destroy(Layer * layer){
@@ -131,6 +137,7 @@ void layer_busy_destroy(Layer * layer){
 		layer_destroy(layer);
 		layer = NULL;
 	}
+	s_events = layer_busy_events_destory_safe(s_events,&s_events_length);
 }
 
 void layer_busy_updater(Layer *layer, GContext *ctx){
@@ -157,7 +164,7 @@ void layer_busy_updater(Layer *layer, GContext *ctx){
 	#endif
 	
 	for (int i=0;i<s_events_length;i=i+1){
-		LOG("start drawing from %d s=%d,e=%d", s_events, s_events[i].start, s_events[i].end);
+		//LOG("start drawing from %d s=%d,e=%d", s_events, s_events[i].start, s_events[i].end);
 		if (s_events[i].end < 60){
 			draw_arc(&fctx, center_x , center_y , innerRadius , outerRadius, MAX(angle,s_events[i].start),  s_events[i].end, DEF_LAYER_BUSY_COLOR_AM);
 		}else if(s_events[i].start < 120){

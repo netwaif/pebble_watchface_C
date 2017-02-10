@@ -1,6 +1,6 @@
 #include <pebble.h>
-#include "src/c/libs/fctx.h"
-#include "src/c/libs/ffont.h"
+#include <pebble-fctx/fctx.h>
+#include <pebble-fctx/ffont.h>
 #include "layer_battery.h"
 #include "src/c/config.h"
 

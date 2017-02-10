@@ -8,3 +8,5 @@ Layer * layer_busy_create(GRect layer_bounds);
 void layer_busy_destroy(Layer * layer);
 
 void layer_busy_updater(Layer *layer, GContext *ctx);
+
+void layer_busy_events_update();

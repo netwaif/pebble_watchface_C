@@ -26,6 +26,7 @@ void tick_handler(struct tm *tick_time, TimeUnits units_changed){
 				layer_time_update_time(tick_time, s_layers_pointers[DEF_LAYERS_ORDER_TIME]); //reqeusting TIME redraw
 				//bluetooth_refresh();  //explicitly request update of bluetooth status
 				//battery_bar_refresh(); //explicitly request update of battery charge
+				layer_busy_events_update(); //explicitely request new data from phone
 			}
 		}
 	#endif
@@ -119,7 +120,6 @@ void system_init(void) {
 	for (char i = 1; i <= DEF_LAYERS_MAX; i = i + 1){
 		s_layers_pointers[i-1] = NULL;
 	}
-	mqueue_init(true);
 	s_main_window = main_window_init();
 	#if !DEBUG //subscribe to MINUTE tick for production mode
 		tick_timer_service_subscribe(DAY_UNIT+MINUTE_UNIT, tick_handler);		
@@ -127,6 +127,8 @@ void system_init(void) {
 		tick_timer_service_subscribe(DAY_UNIT+MINUTE_UNIT+SECOND_UNIT, tick_handler);
 		LOG("subscribed to DAY+MINUTE+SECOND_UNIT");
 	#endif
+	mqueue_init(true);
+
 	LOG("system_init END");
 }
 
@@ -134,6 +136,7 @@ void system_deinit(void) {
   LOG("system_DEinit START");
 	app_message_deregister_callbacks();
 	tick_timer_service_unsubscribe();
+	mqueue_deinit();
 	window_destroy(s_main_window);
 	LOG("system_DEinit END");
 }

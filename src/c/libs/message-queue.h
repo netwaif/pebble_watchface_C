@@ -12,3 +12,4 @@ void mqueue_init_custom(bool autostart, uint16_t inbox_size, uint16_t outbox_siz
 bool mqueue_add(char* group, char* operation, char* params);
 void mqueue_register_handler(char* group, MessageHandler handler);
 void mqueue_enable_sending(void);
+void mqueue_deinit();

@@ -1,6 +1,9 @@
 {
     "author": "netwaif@gmail.com",
-    "dependencies": {},
+    "dependencies": {
+        "pebble-fctx": "^1.6.1",
+        "pebble-utf8": "^1.0.1"
+    },
     "keywords": [],
     "name": "pebble_watchface_c",
     "pebble": {
@@ -9,7 +12,11 @@
         ],
         "displayName": "pebble_watchface_C",
         "enableMultiJS": true,
-        "messageKeys": [],
+        "messageKeys": {
+            "data": 2,
+            "group": 0,
+            "operation": 1
+        },
         "projectType": "native",
         "resources": {
             "media": [

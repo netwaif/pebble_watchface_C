@@ -39,7 +39,6 @@ static event* layer_busy_events_init_safe(int *len){
 
 void layer_busy_msg_handler(char* operation, char* data){
 	if (strcmp(operation, "UPDATE") == 0) {
-		s_requested_update = false;
   	s_events = layer_busy_events_destory_safe(s_events, &s_events_length);
 		ProcessingState* parser = data_processor_create(data, '|');
 		s_events_length = data_processor_get_int(parser);
@@ -61,12 +60,13 @@ void layer_busy_msg_handler(char* operation, char* data){
   else{
     LOG("unknown OPERATION!");
   }
+	s_requested_update = false;
 }
 
 
 void layer_busy_events_update(){
 	//requests the new data from mobile
-	if (!s_requested_update){
+	if (!s_requested_update && connection_service_peek_pebble_app_connection()){
 		mqueue_add(DEF_LAYER_BUSY_MSG_GROUP, "REQUEST", "");
 		s_requested_update = true;
 	}
@@ -110,8 +110,8 @@ Layer * layer_busy_create(GRect layer_bounds){
 	s_layer_busy = layer_create(layer_bounds);
 	
 	#if DEBUG
-		char *debug_str = "6|0|1|10|11|20|21|30|31|40|41|50|51";
-		persist_write_int(DEF_PERSIST_BUSY_LEN_KEY, 6);
+		char *debug_str = "24|0|1|5|6|10|11|15|16|20|21|25|26|30|31|35|36|40|41|45|46|50|51|55|56|60|61|65|66|70|71|75|76|80|81|85|86|90|91|95|96|100|101|105|106|110|111|115|116";
+		persist_write_int(DEF_PERSIST_BUSY_LEN_KEY, 24);
 		persist_write_string(DEF_PERSIST_BUSY_ARR_KEY, debug_str);
 	#endif
 	

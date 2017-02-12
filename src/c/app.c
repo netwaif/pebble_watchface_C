@@ -17,17 +17,16 @@ void tick_handler(struct tm *tick_time, TimeUnits units_changed){
 	
 	#if DEBUG
 		if (SECOND_UNIT & units_changed){
-			LOG("TICK SEC!");
 			if (tick_time->tm_sec % DEF_LAYER_BUSY_TICKER_INTERVAL==0){
 				LOG("TICK TICKER_INTERVAL (%d)!",DEF_LAYER_BUSY_TICKER_INTERVAL);
 				layer_bg_update(s_layers_pointers[DEF_LAYERS_ORDER_BG]);  //explicitely request update of background (sets redraw flag to TRUE)
 				layer_busy_update(s_layers_pointers[DEF_LAYERS_ORDER_BUSY],tick_time);
-				layer_date_update_date(tick_time, s_layers_pointers[DEF_LAYERS_ORDER_DATE]); //requesting DATE redraw
-				layer_time_update_time(tick_time, s_layers_pointers[DEF_LAYERS_ORDER_TIME]); //reqeusting TIME redraw
+				//layer_busy_events_update(); //explicitely request new data from phone
 				//bluetooth_refresh();  //explicitly request update of bluetooth status
 				//battery_bar_refresh(); //explicitly request update of battery charge
-				layer_busy_events_update(); //explicitely request new data from phone
 			}
+			layer_date_update_date(tick_time, s_layers_pointers[DEF_LAYERS_ORDER_DATE]); //requesting DATE redraw
+			layer_time_update_time(tick_time, s_layers_pointers[DEF_LAYERS_ORDER_TIME]); //reqeusting TIME redraw
 		}
 	#endif
 	
@@ -115,6 +114,16 @@ Window *main_window_init(void){
 	return window;
 }
 
+void appmessage_sys_handler(char* operation, char* data){
+	if (strcmp(operation, "INIT") == 0) {
+		LOG("SYS msg handler: got INIT msg with data=%s", data);
+		layer_busy_events_update(); //as soon as the connection is up - request the updated free/busy from phone
+  }
+  else{
+    LOG("SYS msg handler: unknown OPERATION!");
+  }
+}
+
 void system_init(void) {
   LOG("system_init START");
 	for (char i = 1; i <= DEF_LAYERS_MAX; i = i + 1){
@@ -128,7 +137,8 @@ void system_init(void) {
 		LOG("subscribed to DAY+MINUTE+SECOND_UNIT");
 	#endif
 	mqueue_init(true);
-
+	mqueue_register_handler("SYS", appmessage_sys_handler);
+	
 	LOG("system_init END");
 }
 

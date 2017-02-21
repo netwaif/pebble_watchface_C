@@ -14,7 +14,7 @@ static Window *s_main_window;
 void NULL_CALLBACK(){}
 
 void tick_handler(struct tm *tick_time, TimeUnits units_changed){
-	
+
 	#if DEBUG
 		if (SECOND_UNIT & units_changed){
 			if (tick_time->tm_sec % DEF_LAYER_BUSY_TICKER_INTERVAL==0){

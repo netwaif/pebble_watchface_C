@@ -1,3 +1,11 @@
-secrets.js
+build
+build.sh
+node_modules
+.settings
+.idea
+.lock-waf_linux2_build
 src/pkjs/secrets.js
+secrets.js
 _fonts/*
+.cproject
+.project

@@ -6,10 +6,7 @@
 #include "src/c/libs/message-queue.h"
 #include "src/c/modules/graphics.h"
 
-#define DEF_LAYER_BUSY_STR_LEN_MAX 256
-#define DEF_LAYER_BUSY_MSG_GROUP "BUSY"
-#define DEF_PERSIST_BUSY_LEN_KEY 0
-#define DEF_PERSIST_BUSY_ARR_KEY 1
+
 
 static Layer* s_layer_busy = NULL;
 static bool s_redraw_flag = true;
@@ -37,15 +34,33 @@ static event* layer_busy_events_init_safe(int *len){
 	return arr;
 }
 
+static void layer_busy_events_parse_string(char *str, event *arr, int *len){
+	ProcessingState* parser = data_processor_create(str, '|');
+	int l = data_processor_get_int(parser);
+	LOG("parse_string: START parsing of %d/%d from %s", l, *len, str);
+	if (l!=*len){*len = l;}
+	for (int i=0; i<l; i+=1){
+		int s = data_processor_get_int(parser);
+		int e = data_processor_get_int(parser);
+		//LOG("parsed: s=%d, e=%d",s,e);
+		arr[i].start = s;
+		arr[i].end = e;
+	}
+	LOG("parse_string: parsing END, parsed %d of %d", 2*l, data_processor_count(parser)-1);
+	data_processor_destroy(parser);
+}
+
 void layer_busy_msg_handler(char* operation, char* data){
 	if (strcmp(operation, "UPDATE") == 0) {
-  	s_events = layer_busy_events_destory_safe(s_events, &s_events_length);
+		s_events = layer_busy_events_destory_safe(s_events, &s_events_length);
 		ProcessingState* parser = data_processor_create(data, '|');
 		s_events_length = data_processor_get_int(parser);
+		data_processor_destroy(parser);
 		s_events = layer_busy_events_init_safe(&s_events_length);
 		persist_write_int(DEF_PERSIST_BUSY_LEN_KEY, s_events_length);
 		persist_write_string(DEF_PERSIST_BUSY_ARR_KEY, data);
-		LOG("parse_string: START parsing of %d from %s", s_events_length, data);
+		layer_busy_events_parse_string(data, s_events, &s_events_length);
+		/*LOG("parse_string: START parsing of %d from %s", s_events_length, data);
 		for (int i=0; i<s_events_length; i+=1){
 			int s = data_processor_get_int(parser);
 			int e = data_processor_get_int(parser);
@@ -53,8 +68,8 @@ void layer_busy_msg_handler(char* operation, char* data){
 			s_events[i].start = s;
 			s_events[i].end = e;
 		}
-		LOG("parse_string: parsing END, parsed %d of %d", 2*s_events_length, data_processor_count(parser)-1);
-		data_processor_destroy(parser);
+		LOG("parse_string: parsing END, parsed %d of %d", 2*s_events_length, data_processor_count(parser)-1);*/
+
 		layer_mark_dirty(s_layer_busy);
   }
   else{
@@ -72,21 +87,6 @@ void layer_busy_events_update(){
 	}
 }
 
-static void layer_busy_events_parse_string(char *str, event *arr, int *len){
-	ProcessingState* parser = data_processor_create(str, '|');
-	int l = data_processor_get_int(parser);
-	LOG("parse_string: START parsing of %d/%d from %s", l, *len, str);
-	if (l!=*len){*len = l;}
-	for (int i=0; i<l; i+=1){
-		int s = data_processor_get_int(parser);
-		int e = data_processor_get_int(parser);
-		//LOG("parsed: s=%d, e=%d",s,e);
-		arr[i].start = s;
-		arr[i].end = e;
-	}
-	LOG("parse_string: parsing END, parsed %d of %d", 2*l, data_processor_count(parser)-1);
-	data_processor_destroy(parser);
-}
 
 void layer_busy_persist_load(event *arr, int *len){
 	if (persist_exists(DEF_PERSIST_BUSY_LEN_KEY)&&persist_exists(DEF_PERSIST_BUSY_ARR_KEY)){

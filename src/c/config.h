@@ -32,6 +32,16 @@
 #define DEF_LAYER_BUSY_HAND_WIDTH 2
 #define DEF_LAYER_BUSY_HAND_LENGTH 6
 #define DEF_LAYER_BUSY_HAND_COLOR GColorRed
+#define DEF_LAYER_BUSY_STR_LEN_MAX 256
+
+#define DEF_LAYER_EVENTS_STR_LEN_MAX 512
+#define DEF_LAYER_EVENTS_SUMMARY_LEN_MAX 64
+#define DEF_LAYER_EVENTS_HEIGHT 43
+#define DEF_LAYER_EVENTS_MARGIN 0
+#define DEF_LAYER_EVENTS_WIDTH 43
+#define DEF_LAYER_EVENTS_COLOR GColorBlack
+#define DEF_LAYER_EVENTS_FONT RESOURCE_ID_FONT_OPENSANS_BOLD
+#define DEF_LAYER_EVENTS_LINES_MAX 5
 
 #define DEF_LAYER_BG_COLOR GColorBlack
 #define DEF_LAYER_BG_L_WID 3
@@ -43,6 +53,15 @@
 
 #define DEF_MESSAGE_QUEUE_INBOX_SIZE 1024
 #define DEF_MESSAGE_QUEUE_OUTBOX_SIZE 1024
+#define DEF_LAYER_BUSY_MSG_GROUP "BUSY"
+#define DEF_LAYER_EVENTS_MSG_GROUP "EVENTS"
+
+
+#define DEF_PERSIST_BUSY_LEN_KEY 0
+#define DEF_PERSIST_BUSY_ARR_KEY 1
+#define DEF_PERSIST_EVENTS_LEN_KEY 2
+#define DEF_PERSIST_EVENTS_ARR_KEY 3
+
 
 #define free_safe(ptr) if (NULL != ptr) { LOG("free_safe: %p", ptr); free(ptr); ptr = NULL; }
 #define persist_read_int_safe(key, value) (persist_exists(key) ? persist_read_int(key) : value);

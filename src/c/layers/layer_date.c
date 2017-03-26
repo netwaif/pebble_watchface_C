@@ -22,17 +22,17 @@ void layer_date_updater(Layer *layer, GContext *ctx){
 	//GRect prev_bounds = data->prev_bounds;
 	struct tm * curr_time = &data->curr_time;
 	//prepare the text to be displayed
-	char s_buffer[]="31 Oct, WED";
-	strftime(s_buffer, sizeof(s_buffer), "%d %b, %a", curr_time);
+	char buffer[]="31 Oct, WED";
+	strftime(buffer, sizeof(buffer), "%d %b, %a", curr_time);
 	
 	//init FCTX context
 	FContext fctx;
 	fctx_enable_aa(true);
-  fctx_init_context(&fctx, ctx);
+	fctx_init_context(&fctx, ctx);
 	//calculate the text width based on layer's height
 	GRect layer_bounds = layer_get_bounds(layer);
 	fctx_set_text_em_height(&fctx, s_date_font, layer_bounds.size.h);
-	fixed_t text_width = fctx_string_width(&fctx, s_buffer, s_date_font);
+	fixed_t text_width = fctx_string_width(&fctx, buffer, s_date_font);
 	//get the text bounds based on text size and align it within layer_bounds
 	GRect text_bounds = GRect(layer_bounds.size.w/2-FIXED_TO_INT(text_width/2),0,FIXED_TO_INT(text_width),layer_bounds.size.h);
 	//clearing the text area based on text_bounds
@@ -45,7 +45,7 @@ void layer_date_updater(Layer *layer, GContext *ctx){
 	//draw the text.. finally...
 	fctx_begin_fill(&fctx);
 	fctx_set_fill_color(&fctx, DEF_LAYER_DATE_COLOR);
-	fctx_draw_string(&fctx, s_buffer, s_date_font, GTextAlignmentCenter, FTextAnchorBaseline);
+	fctx_draw_string(&fctx, buffer, s_date_font, GTextAlignmentCenter, FTextAnchorBaseline);
 	fctx_end_fill(&fctx);
 	//deinit the fctx context
 	fctx_deinit_context(&fctx);

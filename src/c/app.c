@@ -24,10 +24,10 @@ void tick_handler(struct tm *tick_time, TimeUnits units_changed){
 
 				//layer_busy_events_update(); //explicitly request new data from phone
 				layer_events_events_update(); //explicitly request new data from phone
+//				layer_date_update_date(tick_time, s_layers_pointers[DEF_LAYERS_ORDER_DATE]); //requesting DATE redraw
 				//bluetooth_refresh();  //explicitly request update of bluetooth status
 				//battery_bar_refresh(); //explicitly request update of battery charge
 			}
-//			layer_date_update_date(tick_time, s_layers_pointers[DEF_LAYERS_ORDER_DATE]); //requesting DATE redraw
 			layer_time_update_time(tick_time, s_layers_pointers[DEF_LAYERS_ORDER_TIME]); //reqeusting TIME redraw
 			layer_events_update(s_layers_pointers[DEF_LAYERS_ORDER_EVENTS],tick_time);
 		}
@@ -104,6 +104,17 @@ void main_window_unload(Window *window){
 	layer_events_destroy(s_layers_pointers[DEF_LAYERS_ORDER_EVENTS]);
 }
 
+void appmessage_sys_handler(char* operation, char* data){
+	if (strcmp(operation, "INIT") == 0) {
+		LOG("SYS msg handler: got INIT msg with data=%s", data);
+		layer_busy_events_update(); //as soon as the connection is up - request the updated free/busy from phone
+		layer_events_events_update(); //as soon as BT is up - request updated EVENTS data from the phone
+  }
+  else{
+    LOG("SYS msg handler: unknown OPERATION!");
+  }
+}
+
 void main_window_appear(Window *window){
 	LOG("main_window_appear");
 }
@@ -125,17 +136,6 @@ Window *main_window_init(void){
 	layer_set_update_proc(root_layer, NULL_CALLBACK);
 	window_stack_push(window, false);
 	return window;
-}
-
-void appmessage_sys_handler(char* operation, char* data){
-	if (strcmp(operation, "INIT") == 0) {
-		LOG("SYS msg handler: got INIT msg with data=%s", data);
-//		layer_busy_events_update(); //as soon as the connection is up - request the updated free/busy from phone
-		layer_events_events_update(); //as soon as BT is up - request updated EVENTS data from the phone
-  }
-  else{
-    LOG("SYS msg handler: unknown OPERATION!");
-  }
 }
 
 void system_init(void) {

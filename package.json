@@ -43,9 +43,7 @@
                 {
                     "file": "data/FONT_ARIAL",
                     "name": "FONT_ARIAL",
-                    "targetPlatforms": [
-                        "chalk"
-                    ],
+                    "targetPlatforms": null,
                     "type": "raw"
                 }
             ]

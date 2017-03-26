@@ -82,11 +82,11 @@ Layer * layer_date_create(GRect layer_bounds){
 
 void layer_date_destroy(Layer * layer){
 	if (layer != NULL){  //check if the pointer is not NULL (calling twice)
-
 		layer_destroy(layer);
 		layer = NULL;
-	}
-	if (s_date_font != NULL) {
-		ffont_destroy(s_date_font);	//freeing memory fron the font
+	
+		if (s_date_font != NULL) {
+			ffont_destroy(s_date_font);	//freeing memory fron the font
+		}
 	}
 }

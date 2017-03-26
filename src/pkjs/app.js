@@ -59,14 +59,15 @@ function events_stringify(events){
         	var next_day = (start.getYear()-now.getYear())*365+(start.getMonth()-now.getMonth())*30+(start.getDate()-now.getDate());
             start.setHours(start.getHours() - start.getTimezoneOffset() / 60);
             end.setHours(end.getHours() - end.getTimezoneOffset() / 60);
-        	res = res + ((next_day>0)?'|+':'|')
-				+ ((start.getHours()<10)?'0':'') + start.getHours() + ':'
-				+ ((start.getMinutes()<10)?'0':'') + start.getMinutes() + ' '
-				+ sum.slice(0,32);
+        	res = res + ((next_day>0)?'|\x2B':'|') 	
+					+ ((start.getHours()<10)?'0':'') 
+					+ start.getHours() + ':' 
+					+ ((start.getMinutes()<10)?'0':'') + start.getMinutes() + ' '
+					+ sum.slice(0,32);
         	count++;
 	   	}else if(events[i].start.date!=null && events[i].end.date!=null){
-			//count++;
-		}
+				//count++;
+			}
     }
     res = count + ((count==0)?'|':'') + res;
     console.log("EVENTS stringify (out of "+events.length +"): " + res);

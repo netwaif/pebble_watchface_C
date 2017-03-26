@@ -21,7 +21,6 @@ void tick_handler(struct tm *tick_time, TimeUnits units_changed){
 				LOG("TICK TICKER_INTERVAL (%d)!",DEF_LAYER_BUSY_TICKER_INTERVAL);
 //				layer_bg_update(s_layers_pointers[DEF_LAYERS_ORDER_BG]);  //explicitely request update of background (sets redraw flag to TRUE)
 //				layer_busy_update(s_layers_pointers[DEF_LAYERS_ORDER_BUSY],tick_time);
-
 				//layer_busy_events_update(); //explicitly request new data from phone
 				layer_events_events_update(); //explicitly request new data from phone
 //				layer_date_update_date(tick_time, s_layers_pointers[DEF_LAYERS_ORDER_DATE]); //requesting DATE redraw
@@ -107,7 +106,7 @@ void main_window_unload(Window *window){
 void appmessage_sys_handler(char* operation, char* data){
 	if (strcmp(operation, "INIT") == 0) {
 		LOG("SYS msg handler: got INIT msg with data=%s", data);
-		layer_busy_events_update(); //as soon as the connection is up - request the updated free/busy from phone
+//		layer_busy_events_update(); //as soon as the connection is up - request the updated free/busy from phone
 		layer_events_events_update(); //as soon as BT is up - request updated EVENTS data from the phone
   }
   else{

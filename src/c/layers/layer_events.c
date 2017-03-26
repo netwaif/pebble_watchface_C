@@ -162,10 +162,10 @@ void layer_events_updater(Layer *layer, GContext *ctx){
 	graphics_context_set_fill_color(ctx, DEF_LAYER_BACKGROUND);
 	graphics_fill_rect(ctx, layer_bounds, 0, GCornersAll);
 
-	char *buffer = malloc(DEF_LAYER_EVENTS_STR_LEN_MAX);
+	char *buffer = malloc(32);
 	for (int i=0;i<MIN(s_events_length,DEF_LAYER_EVENTS_LINES_MAX);i=i+1){
-		strcpy(buffer,s_events[i].summary);
-
+		strncpy(buffer,s_events[i].summary,30);
+		
 		fctx_set_text_em_height(&fctx, s_events_font, layer_bounds.size.h/MIN(s_events_length,DEF_LAYER_EVENTS_LINES_MAX));
 		fixed_t text_width = fctx_string_width(&fctx, buffer, s_events_font);
 		//get the text bounds based on text size and align it within layer_bounds

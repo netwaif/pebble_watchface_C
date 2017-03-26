@@ -56,7 +56,7 @@ static void layer_events_events_parse_string(char *str, event *arr, int *len){
 		//LOG("parsed: s=%d, e=%d",s_events[i].start,s_events[i].end);
 		arr[i].summary = data_processor_get_string(parser);
 	}
-	LOG("parse_string: parsing END, parsed %d of %d", 2*l, data_processor_count(parser)-1);
+	LOG("parse_string: parsing END, parsed %d of %d", 3*l, data_processor_count(parser)-1);
 	data_processor_destroy(parser);
 }
 
@@ -122,7 +122,10 @@ Layer * layer_events_create(GRect layer_bounds){
 	s_current_time = *localtime(&start);
 
 	//load the font for events display
-	s_events_font = ffont_create_from_resource(DEF_LAYER_EVENTS_FONT);
+	if (s_dateevents_font == NULL){
+		s_dateevents_font = ffont_create_from_resource(DEF_LAYER_DATEEVENTS_FONT);
+	}
+	s_events_font = s_dateevents_font;
 
 	//assign update handler for the layer
 	layer_set_update_proc(s_layer_events, layer_events_updater);
@@ -140,52 +143,63 @@ void layer_events_destroy(Layer * layer){
 		layer = NULL;
 	}
 	s_events = layer_events_events_destory_safe(s_events,&s_events_length);
+	if (s_events_font != NULL) {
+		ffont_destroy(s_events_font);
+	}
 }
 
 void layer_events_updater(Layer *layer, GContext *ctx){
 	if (!s_redraw_flag){return;}else{s_redraw_flag = false;} // if the flag is FALSE - we DON'T redraw - just quit
 	LOG("EVENTS layer UPDATER");
-	char *buffer = malloc(DEF_LAYER_EVENTS_STR_LEN_MAX);
-	char *ptr=buffer;
-	for (int i=0;i<s_events_length;i=i+1){
-		strcpy(ptr,s_events[i].summary);
-		ptr=ptr+strlen(s_events[i].summary)-1;
-	}
 
 	//init FCTX context
 	FContext fctx;
 	fctx_enable_aa(true);
 	fctx_init_context(&fctx, ctx);
+
 	//calculate the text width based on layer's height
 	GRect layer_bounds = layer_get_bounds(layer);
-	fctx_set_text_em_height(&fctx, s_events_font, layer_bounds.size.h/DEF_LAYER_EVENTS_LINES_MAX-1);
-	fixed_t text_width = fctx_string_width(&fctx, buffer, s_events_font);
-	//get the text bounds based on text size and align it within layer_bounds
-	GRect text_bounds = GRect(layer_bounds.size.w/2-FIXED_TO_INT(text_width/2),0,FIXED_TO_INT(text_width),layer_bounds.size.h);
-	//clearing the text area based on text_bounds
 	graphics_context_set_fill_color(ctx, DEF_LAYER_BACKGROUND);
-	graphics_fill_rect(ctx, text_bounds, 0, GCornersAll);
-	//getting the anchor point from local coords into FPoint coords for fctx
-	GPoint gAbsOffset = layer_convert_point_to_screen(layer, GPoint(text_bounds.origin.x+text_bounds.size.w/2 , text_bounds.origin.y+text_bounds.size.h-1));
-	FPoint fAbsOffset = FPoint(INT_TO_FIXED(gAbsOffset.x),INT_TO_FIXED(gAbsOffset.y));
-	fctx_set_offset(&fctx, fAbsOffset);
-	//draw the text.. finally...
-	fctx_begin_fill(&fctx);
-	fctx_set_fill_color(&fctx, DEF_LAYER_DATE_COLOR);
-	fctx_draw_string(&fctx, buffer, s_events_font, GTextAlignmentCenter, FTextAnchorBaseline);
-	fctx_end_fill(&fctx);
+	graphics_fill_rect(ctx, layer_bounds, 0, GCornersAll);
+
+	char *buffer = malloc(DEF_LAYER_EVENTS_STR_LEN_MAX);
+	for (int i=0;i<MIN(s_events_length,DEF_LAYER_EVENTS_LINES_MAX);i=i+1){
+		strcpy(buffer,s_events[i].summary);
+
+		fctx_set_text_em_height(&fctx, s_events_font, layer_bounds.size.h/MIN(s_events_length,DEF_LAYER_EVENTS_LINES_MAX));
+		fixed_t text_width = fctx_string_width(&fctx, buffer, s_events_font);
+		//get the text bounds based on text size and align it within layer_bounds
+		GRect text_bounds = GRect(layer_bounds.size.w/2-FIXED_TO_INT(text_width/2)
+				,i*layer_bounds.size.h/MIN(s_events_length,DEF_LAYER_EVENTS_LINES_MAX)
+				,FIXED_TO_INT(text_width)
+				,layer_bounds.size.h/MIN(s_events_length,DEF_LAYER_EVENTS_LINES_MAX));
+		//clearing the text area based on text_bounds
+		//graphics_fill_rect(ctx, text_bounds, 0, GCornersAll);
+		//getting the anchor point from local coords into FPoint coords for fctx
+		GPoint gAbsOffset = layer_convert_point_to_screen(layer, GPoint(text_bounds.origin.x+text_bounds.size.w/2 , text_bounds.origin.y+text_bounds.size.h-1));
+		FPoint fAbsOffset = FPoint(INT_TO_FIXED(gAbsOffset.x),INT_TO_FIXED(gAbsOffset.y));
+		fctx_set_offset(&fctx, fAbsOffset);
+		//draw the text.. finally...
+		fctx_begin_fill(&fctx);
+		fctx_set_fill_color(&fctx, DEF_LAYER_DATE_COLOR);
+		fctx_draw_string(&fctx, buffer, s_events_font, GTextAlignmentCenter, FTextAnchorBaseline);
+		fctx_end_fill(&fctx); //!!!!!!!!!!
+		#if DEBUG
+			//graphics_draw_rect(ctx, text_bounds);
+		#endif
+	}
+
 	//deinit the fctx context
 	fctx_deinit_context(&fctx);
-	free_safe(buffer);
 
 	#if DEBUG  //drawing the outline boarder of layer and text area according to its size
 		graphics_context_set_stroke_width(ctx, 1);
 		graphics_context_set_stroke_color(ctx, GColorRed);
 		graphics_draw_rect(ctx, layer_bounds);
 		graphics_context_set_stroke_color(ctx, GColorGreen);
-		graphics_draw_rect(ctx, text_bounds);
 	#endif
 
+	free_safe(buffer);
 	LOG("EVENTS layer UPDATER done!");
 }
 

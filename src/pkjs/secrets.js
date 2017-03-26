@@ -5,10 +5,41 @@ var redirect_uri = 'http://netwaif.org.ru/pebble/catchauth.html';
 
 //https://www.googleapis.com/calendar/v3/calendars/primary/events?singleEvents=true&orderBy=startTime&timeMin=2017-03-28T00:00:00Z&maxResults=10
 var test_events = {
-    "nextPageToken": "EiUKGm50YnQxb211MGdja2diaDA0c2lta25nZ2lvGID0y4vu_tIC",
+    "nextPageToken": "ElkKTl82OG8zMmRwZzY4cDNhbDFoNjBwajRjMW9iOG1taWdyMWRncTZrZzM2ZWNtbTRyMWQ2MHAyc29qMWRwbG0ycXIxY2hpbXFxYjU1cGk2YRiAyOHX7v3SAg==",
     "kind": "calendar#events",
     "defaultReminders": [],
     "items": [
+        {
+            "status": "confirmed",
+            "kind": "calendar#event",
+            "end": {
+                "dateTime": "2017-03-27T00:00:00+02:00"
+            },
+            "created": "2017-03-26T11:31:24.000Z",
+            "iCalUID": "1b60kj3uofcec9jlga36l6vfos@google.com",
+            "reminders": {
+                "useDefault": true
+            },
+            "htmlLink": "https://www.google.com/calendar/event?eid=MWI2MGtqM3VvZmNlYzlqbGdhMzZsNnZmb3MgbmV0d2FpZkBt",
+            "sequence": 7,
+            "updated": "2017-03-26T14:39:15.656Z",
+            "summary": "test1",
+            "start": {
+                "dateTime": "2017-03-26T23:00:00+02:00"
+            },
+            "etag": "\"2981078311312000\"",
+            "organizer": {
+                "self": true,
+                "displayName": "Roman Frolov",
+                "email": "netwaif@gmail.com"
+            },
+            "creator": {
+                "self": true,
+                "displayName": "Roman Frolov",
+                "email": "netwaif@gmail.com"
+            },
+            "id": "1b60kj3uofcec9jlga36l6vfos"
+        },
         {
             "status": "confirmed",
             "kind": "calendar#event",
@@ -74,21 +105,28 @@ var test_events = {
             "status": "confirmed",
             "kind": "calendar#event",
             "end": {
-                "dateTime": "2017-03-28T07:00:00+02:00"
+                "date": "2017-03-28"
             },
-            "created": "2017-03-26T11:31:24.000Z",
-            "iCalUID": "1b60kj3uofcec9jlga36l6vfos@google.com",
+            "created": "2017-03-13T09:36:29.000Z",
+            "iCalUID": "g6si0h1pajj80dd6gqtovskgc8@google.com",
             "reminders": {
-                "useDefault": true
+                "overrides": [
+                    {
+                        "minutes": 840,
+                        "method": "popup"
+                    }
+                ],
+                "useDefault": false
             },
-            "htmlLink": "https://www.google.com/calendar/event?eid=MWI2MGtqM3VvZmNlYzlqbGdhMzZsNnZmb3MgbmV0d2FpZkBt",
-            "sequence": 3,
-            "updated": "2017-03-26T11:46:47.503Z",
-            "summary": "test1",
+            "htmlLink": "https://www.google.com/calendar/event?eid=ZzZzaTBoMXBhamo4MGRkNmdxdG92c2tnYzggbmV0d2FpZkBt",
+            "sequence": 0,
+            "updated": "2017-03-13T09:36:29.458Z",
+            "summary": "Immo: \u043f\u0435\u0440\u0435\u0432\u043e\u0434 miete+kaution",
             "start": {
-                "dateTime": "2017-03-28T04:00:00+02:00"
+                "date": "2017-03-27"
             },
-            "etag": "\"2981057615006000\"",
+            "etag": "\"2978795578825000\"",
+            "transparency": "transparent",
             "organizer": {
                 "self": true,
                 "displayName": "Roman Frolov",
@@ -99,7 +137,91 @@ var test_events = {
                 "displayName": "Roman Frolov",
                 "email": "netwaif@gmail.com"
             },
-            "id": "1b60kj3uofcec9jlga36l6vfos"
+            "id": "g6si0h1pajj80dd6gqtovskgc8"
+        },
+        {
+            "status": "confirmed",
+            "kind": "calendar#event",
+            "end": {
+                "timeZone": "Europe/Berlin",
+                "dateTime": "2017-03-27T09:30:00+02:00"
+            },
+            "created": "2017-03-06T12:01:51.000Z",
+            "iCalUID": "6hj68p1o6grm6bb56gpjeb9kcgqj0b9ockp3ab9j6opj4dpk6com6p9pc4@google.com",
+            "reminders": {
+                "overrides": [
+                    {
+                        "minutes": 720,
+                        "method": "popup"
+                    },
+                    {
+                        "minutes": 60,
+                        "method": "popup"
+                    }
+                ],
+                "useDefault": false
+            },
+            "htmlLink": "https://www.google.com/calendar/event?eid=NmhqNjhwMW82Z3JtNmJiNTZncGplYjlrY2dxajBiOW9ja3AzYWI5ajZvcGo0ZHBrNmNvbTZwOXBjNCBuZXR3YWlmQG0",
+            "sequence": 0,
+            "updated": "2017-03-06T12:01:51.224Z",
+            "summary": "Ortho: Dr. Loth",
+            "start": {
+                "timeZone": "Europe/Berlin",
+                "dateTime": "2017-03-27T09:00:00+02:00"
+            },
+            "etag": "\"2977603422343000\"",
+            "organizer": {
+                "self": true,
+                "displayName": "Roman Frolov",
+                "email": "netwaif@gmail.com"
+            },
+            "creator": {
+                "self": true,
+                "displayName": "Roman Frolov",
+                "email": "netwaif@gmail.com"
+            },
+            "id": "6hj68p1o6grm6bb56gpjeb9kcgqj0b9ockp3ab9j6opj4dpk6com6p9pc4"
+        },
+        {
+            "status": "confirmed",
+            "kind": "calendar#event",
+            "end": {
+                "dateTime": "2017-03-27T10:25:00+02:00"
+            },
+            "created": "2017-03-06T18:40:19.000Z",
+            "iCalUID": "5dlqd5ilmhivaccqcp98mnn7ts@google.com",
+            "reminders": {
+                "overrides": [
+                    {
+                        "minutes": 720,
+                        "method": "popup"
+                    },
+                    {
+                        "minutes": 60,
+                        "method": "popup"
+                    }
+                ],
+                "useDefault": false
+            },
+            "htmlLink": "https://www.google.com/calendar/event?eid=NWRscWQ1aWxtaGl2YWNjcWNwOThtbm43dHMgbmV0d2FpZkBt",
+            "sequence": 0,
+            "updated": "2017-03-06T18:40:51.844Z",
+            "summary": "\u0410\u043d\u044f: \u043f\u0440\u0438\u043b\u0435\u0442",
+            "start": {
+                "dateTime": "2017-03-27T10:25:00+02:00"
+            },
+            "etag": "\"2977651303601000\"",
+            "organizer": {
+                "self": true,
+                "displayName": "Roman Frolov",
+                "email": "netwaif@gmail.com"
+            },
+            "creator": {
+                "self": true,
+                "displayName": "Roman Frolov",
+                "email": "netwaif@gmail.com"
+            },
+            "id": "5dlqd5ilmhivaccqcp98mnn7ts"
         },
         {
             "status": "confirmed",
@@ -296,117 +418,11 @@ var test_events = {
                 "email": "netwaif@gmail.com"
             },
             "id": "_68o32dpg68p3al1h60pj4c1ob8mmigr1dgq6kg36ecmm4r1d60p2soj1dplm2qr1chimqqb55pi6a"
-        },
-        {
-            "status": "confirmed",
-            "kind": "calendar#event",
-            "end": {
-                "dateTime": "2017-03-31T00:00:00+02:00"
-            },
-            "created": "2017-03-13T09:40:15.000Z",
-            "iCalUID": "7m5g97ao2ok95daok6a483puk4@google.com",
-            "reminders": {
-                "useDefault": true
-            },
-            "htmlLink": "https://www.google.com/calendar/event?eid=N201Zzk3YW8yb2s5NWRhb2s2YTQ4M3B1azQgbmV0d2FpZkBt",
-            "sequence": 0,
-            "updated": "2017-03-13T18:40:38.143Z",
-            "summary": "\u041f\u0435\u0440\u0435\u0435\u0437\u0434: \u0441\u0431\u043e\u0440 \u0432\u0435\u0449\u0435\u0439",
-            "start": {
-                "dateTime": "2017-03-30T13:00:00+02:00"
-            },
-            "etag": "\"2978860876286000\"",
-            "organizer": {
-                "self": true,
-                "displayName": "Roman Frolov",
-                "email": "netwaif@gmail.com"
-            },
-            "creator": {
-                "self": true,
-                "displayName": "Roman Frolov",
-                "email": "netwaif@gmail.com"
-            },
-            "id": "7m5g97ao2ok95daok6a483puk4"
-        },
-        {
-            "status": "confirmed",
-            "kind": "calendar#event",
-            "end": {
-                "dateTime": "2017-03-30T14:10:00+02:00"
-            },
-            "created": "2017-03-23T08:44:31.000Z",
-            "iCalUID": "rrjpe1gecrc7kql8joc7hdc7mk@google.com",
-            "reminders": {
-                "overrides": [
-                    {
-                        "minutes": 60,
-                        "method": "popup"
-                    }
-                ],
-                "useDefault": false
-            },
-            "htmlLink": "https://www.google.com/calendar/event?eid=cnJqcGUxZ2VjcmM3a3FsOGpvYzdoZGM3bWsgbmV0d2FpZkBt",
-            "sequence": 0,
-            "updated": "2017-03-23T08:44:31.456Z",
-            "summary": "\u041c\u0430\u043c\u0430 IST->FRA TK1591",
-            "start": {
-                "dateTime": "2017-03-30T14:10:00+02:00"
-            },
-            "etag": "\"2980517342810000\"",
-            "organizer": {
-                "self": true,
-                "displayName": "Roman Frolov",
-                "email": "netwaif@gmail.com"
-            },
-            "creator": {
-                "self": true,
-                "displayName": "Roman Frolov",
-                "email": "netwaif@gmail.com"
-            },
-            "id": "rrjpe1gecrc7kql8joc7hdc7mk"
-        },
-        {
-            "status": "confirmed",
-            "kind": "calendar#event",
-            "end": {
-                "dateTime": "2017-03-30T20:00:00+02:00"
-            },
-            "created": "2017-03-23T17:45:19.000Z",
-            "iCalUID": "ntbt1omu0gckgbh04simknggio@google.com",
-            "reminders": {
-                "overrides": [
-                    {
-                        "minutes": 1440,
-                        "method": "popup"
-                    }
-                ],
-                "useDefault": false
-            },
-            "htmlLink": "https://www.google.com/calendar/event?eid=bnRidDFvbXUwZ2NrZ2JoMDRzaW1rbmdnaW8gbmV0d2FpZkBt",
-            "sequence": 1,
-            "updated": "2017-03-23T17:46:18.608Z",
-            "summary": "FS Alumni: Bain&Company",
-            "start": {
-                "dateTime": "2017-03-30T18:30:00+02:00"
-            },
-            "etag": "\"2980582298364000\"",
-            "location": "FS Room 20",
-            "organizer": {
-                "self": true,
-                "displayName": "Roman Frolov",
-                "email": "netwaif@gmail.com"
-            },
-            "creator": {
-                "self": true,
-                "displayName": "Roman Frolov",
-                "email": "netwaif@gmail.com"
-            },
-            "id": "ntbt1omu0gckgbh04simknggio"
         }
     ],
-    "updated": "2017-03-26T11:46:47.635Z",
+    "updated": "2017-03-26T14:39:15.773Z",
     "summary": "netwaif",
-    "etag": "\"p32s91re0hjqd40g\"",
+    "etag": "\"p334ap7c7mfqd40g\"",
     "timeZone": "Europe/Berlin",
     "accessRole": "owner"
 };

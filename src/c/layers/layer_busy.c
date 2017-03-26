@@ -115,7 +115,7 @@ Layer * layer_busy_create(GRect layer_bounds){
 		persist_write_string(DEF_PERSIST_BUSY_ARR_KEY, debug_str);
 	#endif
 	
-	//restore the data from persitant storage into the memory
+	//restore the data from persistent storage into the memory
 	layer_busy_persist_load(s_events, &s_events_length);
 	
 	//initially current time in layer's data for the first drawing
@@ -143,9 +143,6 @@ void layer_busy_destroy(Layer * layer){
 void layer_busy_updater(Layer *layer, GContext *ctx){
 	if (!s_redraw_flag){return;}else{s_redraw_flag = false;} // if the flag is FALSE - we DON'T redraw - just quit
 	LOG("BUSY layer UPDATER");
-	FContext fctx;
-	fctx_enable_aa(true);
-  fctx_init_context(&fctx, ctx);
 	
 	GRect bounds = layer_get_bounds(layer);
 	graphics_context_set_fill_color(ctx, DEF_LAYER_BACKGROUND);
@@ -163,6 +160,10 @@ void layer_busy_updater(Layer *layer, GContext *ctx){
 		angle = (s_current_time.tm_hour*60.0+s_current_time.tm_min)/12.0;
 	#endif
 	
+	FContext fctx;
+	fctx_enable_aa(true);
+	fctx_init_context(&fctx, ctx);
+
 	for (int i=0;i<s_events_length;i=i+1){
 		//LOG("start drawing from %d s=%d,e=%d", s_events, s_events[i].start, s_events[i].end);
 		if (s_events[i].end < 60){
@@ -181,7 +182,7 @@ void layer_busy_updater(Layer *layer, GContext *ctx){
 }
 
 void layer_busy_update(Layer *layer, struct tm *tick_time){
-	s_redraw_flag = true; //explicitly set the flag to TRUE saying, that the updater callback has to erdraw the whole background
+	s_redraw_flag = true; //explicitly set the flag to TRUE saying, that the updater callback has to redraw the whole background
 	s_current_time = *tick_time;
 	layer_mark_dirty(layer);
 }

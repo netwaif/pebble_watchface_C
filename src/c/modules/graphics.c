@@ -1,8 +1,10 @@
 #include <pebble.h>
 #include <pebble-fctx/fctx.h>
 #include <pebble-fctx/fpath.h>
+#include <pebble-fctx/ffont.h>
 #include "src/c/config.h"
 #include "graphics.h"
+
 
 void draw_hand(FContext *fctx, int center_x, int center_y, int inner_r, int outer_r, int width, int seconds, GColor color){
 	int32_t second_angle = TRIG_MAX_ANGLE * (seconds-15) / 60; //offsetting because angles start at 15 seconds mark

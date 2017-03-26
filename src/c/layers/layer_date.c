@@ -3,6 +3,7 @@
 #include <pebble-fctx/ffont.h>
 #include "layer_date.h"
 #include "src/c/config.h"
+#include "src/c/modules/graphics.h"
 
 static FFont *s_date_font;
 static bool s_redraw_flag = true;
@@ -68,7 +69,11 @@ Layer * layer_date_create(GRect layer_bounds){
 	time_t start = time(NULL);
 	data->curr_time = *localtime(&start);
 	//load the font for time display
-	s_date_font = ffont_create_from_resource(DEF_LAYER_DATE_FONT);
+	if (s_dateevents_font == NULL){
+		s_dateevents_font = ffont_create_from_resource(DEF_LAYER_DATEEVENTS_FONT);
+	}
+	s_date_font = s_dateevents_font;
+
 	//assign update handler for the layer
 	layer_set_update_proc(layer, layer_date_updater);
 	LOG("date layer CREATED");
@@ -77,8 +82,11 @@ Layer * layer_date_create(GRect layer_bounds){
 
 void layer_date_destroy(Layer * layer){
 	if (layer != NULL){  //check if the pointer is not NULL (calling twice)
-		ffont_destroy(s_date_font);	//freeing memory fron the font
+
 		layer_destroy(layer);
 		layer = NULL;
+	}
+	if (s_date_font != NULL) {
+		ffont_destroy(s_date_font);	//freeing memory fron the font
 	}
 }

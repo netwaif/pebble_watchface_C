@@ -102,10 +102,9 @@ unsigned int data_processor_get_uint(ProcessingState* state) {
     return -1;
   }
   char* tmp_str = data_processor_get_string(state);
-  char* ptr;
 
-  unsigned long int num = strtoul(tmp_str,&ptr,10);
-
+  long int lres = atol(tmp_str);
+  unsigned int ures = (unsigned int)lres;
   free(tmp_str);
-  return (unsigned int)num;
+  return ures;
 }

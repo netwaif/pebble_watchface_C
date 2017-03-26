@@ -44,24 +44,32 @@ function message_handler(event) {
 }
 
 function events_stringify(events){
-    var i, count, res;
-    count = events.length;
-    for (i=0;i<events.length;++i){
-    	if (events[i].start.startTime && events[i].end.endTime){
-        	var start = new Date(events[i].start.startTime);
+    var count = 0;
+    var res ='';
+    for (var i=0;i<events.length;++i){
+    	if (events[i].start.dateTime != null && events[i].end.dateTime != null){
+        	var start = new Date(events[i].start.dateTime);
         	start.setHours(start.getHours() + start.getTimezoneOffset() / 60);
-        	res = res + '|' + start.valueOf();
-        	var end = new Date(events[i].end.endTime);
+        	res = res + '|' + start.getTime();
+        	var end = new Date(events[i].end.dateTime);
         	end.setHours(end.getHours() + end.getTimezoneOffset() / 60);
-        	res = res + '|' + end.valueOf();
-        	var next_day = (start.getYear()-Date.now().getYear())*365+(start.getMonth()-Date.now().getMonth())*30+(start.getDate()-Date.now().getDate());
-        	res = res +(next_day>0?'|+':'|')+ start.getHours()+':'+start.getMinutes() + ' '+ events[i].summary.slice(0,10) +"\n";
-    	}else if(events[i].start.date && events[i].end.date){
-			count--;
+        	res = res + '|' + end.getTime();
+        	var sum = events[i].summary.toString();
+            var now = new Date(Date.now());
+        	var next_day = (start.getYear()-now.getYear())*365+(start.getMonth()-now.getMonth())*30+(start.getDate()-now.getDate());
+            start.setHours(start.getHours() - start.getTimezoneOffset() / 60);
+            end.setHours(end.getHours() - end.getTimezoneOffset() / 60);
+        	res = res + ((next_day>0)?'|+':'|')
+				+ ((start.getHours()<10)?'0':'') + start.getHours() + ':'
+				+ ((start.getMinutes()<10)?'0':'') + start.getMinutes() + ' '
+				+ sum.slice(0,32);
+        	count++;
+	   	}else if(events[i].start.date!=null && events[i].end.date!=null){
+			//count++;
 		}
     }
-    res = count + (count==0?'|':'') + res;
-    console.log("EVENTS stringify: "+res);
+    res = count + ((count==0)?'|':'') + res;
+    console.log("EVENTS stringify (out of "+events.length +"): " + res);
     return res;
 }
 

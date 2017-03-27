@@ -19,35 +19,37 @@ void tick_handler(struct tm *tick_time, TimeUnits units_changed){
 		if (SECOND_UNIT & units_changed){
 			if (tick_time->tm_sec % DEF_LAYER_BUSY_TICKER_INTERVAL==0){
 				LOG("TICK TICKER_INTERVAL (%d)!",DEF_LAYER_BUSY_TICKER_INTERVAL);
-//				layer_bg_update(s_layers_pointers[DEF_LAYERS_ORDER_BG]);  //explicitely request update of background (sets redraw flag to TRUE)
-//				layer_busy_update(s_layers_pointers[DEF_LAYERS_ORDER_BUSY],tick_time);
-				//layer_busy_events_update(); //explicitly request new data from phone
+				layer_busy_events_update(); //explicitly request new data from phone
 				layer_events_events_update(); //explicitly request new data from phone
-//				layer_date_update_date(tick_time, s_layers_pointers[DEF_LAYERS_ORDER_DATE]); //requesting DATE redraw
 				//bluetooth_refresh();  //explicitly request update of bluetooth status
 				//battery_bar_refresh(); //explicitly request update of battery charge
 			}
-			layer_time_update_time(tick_time, s_layers_pointers[DEF_LAYERS_ORDER_TIME]); //reqeusting TIME redraw
-			layer_events_update(s_layers_pointers[DEF_LAYERS_ORDER_EVENTS],tick_time);
+			
+//			layer_time_update_time(tick_time, s_layers_pointers[DEF_LAYERS_ORDER_TIME]); //reqeusting TIME redraw
+//			layer_date_update_date(tick_time, s_layers_pointers[DEF_LAYERS_ORDER_DATE]); //requesting DATE redraw
+//			layer_bg_update(s_layers_pointers[DEF_LAYERS_ORDER_BG]);  //explicitely request update of background (sets redraw flag to TRUE)
+//			layer_busy_update(s_layers_pointers[DEF_LAYERS_ORDER_BUSY],tick_time);
+//			layer_events_update(s_layers_pointers[DEF_LAYERS_ORDER_EVENTS],tick_time);
 		}
-	#endif
+	
+	#else //if NOT debug
 	
 	if (MINUTE_UNIT & units_changed){
 		if (tick_time->tm_min % DEF_LAYER_BUSY_TICKER_INTERVAL==0){
-//			layer_bg_update(s_layers_pointers[DEF_LAYERS_ORDER_BG]);  //explicitely request update of background (sets redraw flag to TRUE)
-//			layer_busy_update(s_layers_pointers[DEF_LAYERS_ORDER_BUSY],tick_time);
+			layer_bg_update(s_layers_pointers[DEF_LAYERS_ORDER_BG]);  //explicitely request update of background (sets redraw flag to TRUE)
+			layer_busy_update(s_layers_pointers[DEF_LAYERS_ORDER_BUSY],tick_time);
 			layer_events_update(s_layers_pointers[DEF_LAYERS_ORDER_EVENTS], tick_time);
 		}
-//		layer_date_update_date(tick_time, s_layers_pointers[DEF_LAYERS_ORDER_DATE]); //requesting DATE redraw
+		layer_date_update_date(tick_time, s_layers_pointers[DEF_LAYERS_ORDER_DATE]); //requesting DATE redraw
 		layer_time_update_time(tick_time, s_layers_pointers[DEF_LAYERS_ORDER_TIME]);	  //reqeusting TIME redraw
-		//bluetooth_refresh();  //explicitly request update of bluetooth status
-		//battery_bar_refresh(); //explicitly request update of battery charge
+		bluetooth_refresh();  //explicitly request update of bluetooth status
+		battery_bar_refresh(); //explicitly request update of battery charge
 	}
-
 	if (DAY_UNIT & units_changed){
-//		layer_bg_update(s_layers_pointers[DEF_LAYERS_ORDER_BG]);  //explicitely request update of background (sets redraw flag to TRUE)
-//		layer_date_update_date(tick_time, s_layers_pointers[DEF_LAYERS_ORDER_DATE]); //requesting DATE redraw
+		layer_bg_update(s_layers_pointers[DEF_LAYERS_ORDER_BG]);  //explicitely request update of background (sets redraw flag to TRUE)
+		layer_date_update_date(tick_time, s_layers_pointers[DEF_LAYERS_ORDER_DATE]); //requesting DATE redraw
 	}
+	#endif
 }
 
 void main_window_load(Window *window){ 
@@ -72,16 +74,16 @@ void main_window_load(Window *window){
 										 ,DEF_LAYER_INDICATORS_HEIGHT);
 	//creating bounds for events layer
 	GRect layer_events_bounds = GRect(root_bounds.origin.x
-									 ,root_bounds.origin.y+root_bounds.size.h/2 + DEF_LAYER_EVENTS_MARGIN
+									 ,root_bounds.origin.y+root_bounds.size.h/2
 									 ,root_bounds.size.w
-									 ,DEF_LAYER_EVENTS_HEIGHT);
+									 ,root_bounds.size.h/2);
 
-	s_layers_pointers[DEF_LAYERS_ORDER_TIME] = layer_time_create(layer_time_bounds);
+//	s_layers_pointers[DEF_LAYERS_ORDER_TIME] = layer_time_create(layer_time_bounds);
 //	s_layers_pointers[DEF_LAYERS_ORDER_DATE] = layer_date_create(layer_date_bounds);
-	s_layers_pointers[DEF_LAYERS_ORDER_BT] = layer_bluetooth_create(layer_indicators_bounds); 	//creating a bluetooth icon layer
-	s_layers_pointers[DEF_LAYERS_ORDER_BAT] = layer_battery_create(layer_indicators_bounds); 	//creating a battery icon layer
-//	s_layers_pointers[DEF_LAYERS_ORDER_BG] = layer_bg_create(root_bounds); //creating the background
-//	s_layers_pointers[DEF_LAYERS_ORDER_BUSY] = layer_busy_create(root_bounds); //creating the layer for free/busy arcs
+//	s_layers_pointers[DEF_LAYERS_ORDER_BT] = layer_bluetooth_create(layer_indicators_bounds); 	//creating a bluetooth icon layer
+//	s_layers_pointers[DEF_LAYERS_ORDER_BAT] = layer_battery_create(layer_indicators_bounds); 	//creating a battery icon layer
+	s_layers_pointers[DEF_LAYERS_ORDER_BG] = layer_bg_create(root_bounds); //creating the background
+	s_layers_pointers[DEF_LAYERS_ORDER_BUSY] = layer_busy_create(root_bounds); //creating the layer for free/busy arcs
 	s_layers_pointers[DEF_LAYERS_ORDER_EVENTS] = layer_events_create(layer_events_bounds); //creating the events layer
 	
 	for (int i = 0; i < DEF_LAYERS_MAX; i = i + 1){					//adding all created layers to the main window root layer
@@ -97,9 +99,9 @@ void main_window_unload(Window *window){
 	bluetooth_layer_destroy(s_layers_pointers[DEF_LAYERS_ORDER_BT]);
 	battery_bar_layer_destroy(s_layers_pointers[DEF_LAYERS_ORDER_BAT]);
 	layer_time_destroy(s_layers_pointers[DEF_LAYERS_ORDER_TIME]);
-//	layer_date_destroy(s_layers_pointers[DEF_LAYERS_ORDER_DATE]);
-//	layer_bg_destroy(s_layers_pointers[DEF_LAYERS_ORDER_BG]);
-//	layer_busy_destroy(s_layers_pointers[DEF_LAYERS_ORDER_BUSY]);
+	layer_date_destroy(s_layers_pointers[DEF_LAYERS_ORDER_DATE]);
+	layer_bg_destroy(s_layers_pointers[DEF_LAYERS_ORDER_BG]);
+	layer_busy_destroy(s_layers_pointers[DEF_LAYERS_ORDER_BUSY]);
 	layer_events_destroy(s_layers_pointers[DEF_LAYERS_ORDER_EVENTS]);
 }
 

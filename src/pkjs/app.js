@@ -7,7 +7,7 @@ function handle_appmessage_busy(m){
 	if ('REQUEST' == m.operation){
 		var response;
 		//response = '6|1|4|8|15|24|35|47|68|80|98|104|135';
-		response = busy_stringify(secrets.test_busy.calendars['primary'].busy);
+		response = busy_stringify(secrets.test_busy.calendars.primary.busy);
 		MessageQueue.sendAppMessage({ group: 'BUSY', operation: 'UPDATE', data: response});
 		return;
 	}else{
@@ -47,7 +47,7 @@ function events_stringify(events){
     var count = 0;
     var res ='';
     for (var i=0;i<events.length;++i){
-    	if (events[i].start.dateTime != null && events[i].end.dateTime != null){
+    	if (events[i].start.dateTime && events[i].end.dateTime){
         	var start = new Date(events[i].start.dateTime);
         	start.setHours(start.getHours() + start.getTimezoneOffset() / 60);
         	res = res + '|' + start.getTime();
@@ -59,17 +59,17 @@ function events_stringify(events){
         	var next_day = (start.getYear()-now.getYear())*365+(start.getMonth()-now.getMonth())*30+(start.getDate()-now.getDate());
             start.setHours(start.getHours() - start.getTimezoneOffset() / 60);
             end.setHours(end.getHours() - end.getTimezoneOffset() / 60);
-        	res = res + ((next_day>0)?'|\x2B':'|') 	
-					+ ((start.getHours()<10)?'0':'') 
-					+ start.getHours() + ':' 
-					+ ((start.getMinutes()<10)?'0':'') + start.getMinutes() + ' '
-					+ sum.slice(0,32);
+        	res = res + ((next_day>0)?'|\x2B':'|') +	
+					 	((start.getHours()<10)?'0':'') +
+					 	start.getHours() + ':' +
+					 	((start.getMinutes()<10)?'0':'') + start.getMinutes() + ' ' +
+					 	sum.slice(0,32);
         	count++;
-	   	}else if(events[i].start.date!=null && events[i].end.date!=null){
+	   	}else if(events[i].start.date && events[i].end.date){
 				//count++;
 			}
     }
-    res = count + ((count==0)?'|':'') + res;
+    res = count + ((count===0)?'|':'') + res;
     console.log("EVENTS stringify (out of "+events.length +"): " + res);
     return res;
 }
